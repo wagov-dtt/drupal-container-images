@@ -1,0 +1,22 @@
+{
+	"name": "Drupal container images",
+	"image": "ghcr.io/wagov-dtt/devcontainer-base",
+	"privileged": true,
+	"runArgs": [
+		"--cgroupns=host"
+	],
+	"mounts": [
+		"source=dind-var-lib-docker,target=/var/lib/docker,type=volume"
+	],
+	"remoteUser": "vscode",
+    "customizations": {
+        "jetbrains": {
+            "plugins": [
+                "com.github.xepozz.caddy",
+                "com.github.l34130.mise",
+                "org.mvnsearch.plugins.justPlugin",
+                "org.toml.lang"
+            ]
+        }
+    }
+}

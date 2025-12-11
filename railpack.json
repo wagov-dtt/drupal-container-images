@@ -1,0 +1,35 @@
+{
+  "$schema": "https://schema.railpack.com",
+  "steps": {
+    "install:composer": {
+      "commands": [
+        {
+          "image": "composer:latest",
+          "src": "/usr/bin/composer",
+          "dest": "/usr/bin/composer"
+        },
+        {
+          "src": "composer.json",
+          "dest": "composer.json"
+        },
+        {
+          "src": "composer.lock",
+          "dest": "composer.lock"
+        },
+        {
+          "cmd": "COMPOSER_MEMORY_LIMIT=-1 composer install --ansi --no-interaction --no-scripts --optimize-autoloader --prefer-dist"
+        }
+      ]
+    },
+    "build": {
+      "commands": [
+        "...",
+        "ln -sf /app/ /var/www/html",
+        {
+          "src": "Caddyfile",
+          "dest": "/Caddyfile"
+        }
+      ]
+    }
+  }
+}
