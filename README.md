@@ -94,33 +94,6 @@ just clean
 
 **c.)** Remove all **build artifacts**.
 
-### Use in CI/CD
-
-Use [devcontainers/ci](https://github.com/devcontainers/ci) to run `mise` tasks and `just` recipes in your devcontainer for guaranteed environment consistency (example [`test-devcontainer.yml`](.github/workflows/test-devcontainer.yml)):
-
-```yaml
-- name: Configure AWS credentials
-  uses: aws-actions/configure-aws-credentials@v4
-  with:
-    role-to-assume: arn:aws:iam::123456789012:role/GitHubActions
-    aws-region: ap-southeast-2
-
-- name: Run tests in devcontainer
-  uses: devcontainers/ci@v0.3
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  with:
-    imageName: local/devcontainer
-    push: never
-    env: |
-      GITHUB_TOKEN
-    runCmd: |
-      just test
-      mise run lint
-```
-
-**Alternative**: Use [mise GitHub Action](https://github.com/jdx/mise-action) for simple tool management without containers
-
 ## 📦 Included Tools
 
 **Cloud**: Docker  
@@ -156,5 +129,5 @@ just clean
 - [Docker](https://www.docker.com/) - Container platform and BuildKit
 - [just](https://just.systems/) - Command runner
 - [mise](https://mise.jdx.dev/) - Polyglot tool version manager
-- [Railpack](https://railpack.com/)
+- [Railpack](https://railpack.com/) -  Tool for building images from source code
 
