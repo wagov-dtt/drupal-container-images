@@ -58,5 +58,7 @@ clean:
     @echo "🧹 Cleaning up..."
     # Remove images.
     -for entry in "{{app_dir}}"/*/; do docker rmi `basename "$entry"`; done
-    # Remove all sub-direcitories in app directory.
+    # Remove unused Docker data.
+    docker system prune -f
+    # Remove all app artifacts (sub-direcitories) in app directory.
     rm --recursive --force -- {{app_dir}}/*/
