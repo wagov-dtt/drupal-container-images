@@ -23,9 +23,9 @@ build app_name=app_name_default: (prepare app_name)
     # The name of the image.
     docker buildx build \
         --build-arg BUILDKIT_SYNTAX="ghcr.io/railwayapp/railpack-frontend" \
-        --file ./railpack-plan.json \
+        --file {{app_dir}}/{{app_name}}/{{config_dir}}/railpack-plan.json \
         --output type=docker,name={{app_name}} \
-        .
+        {{app_dir}}/{{app_name}}/{{code_dir}}
 
 # Prepare railpack build plan.
 prepare app_name=app_name_default: setup (copy app_name)
