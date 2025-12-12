@@ -14,11 +14,47 @@
 
 ### 🔨 Building container images
 
+#### Architecture of PROD container image
+
+[Caddy](https://caddyserver.com/) **web server** running [FrankenPHP](https://frankenphp.dev/), **Modern PHP App Server**, written in **Go**.
+
+#### Build Drupal container images for specified app (project)
+
 ```bash
-# Core workflow (works locally or in Codespaces)
-just build          # Build Drupal container images for specified app (project).
-just clean          # Clean build artifacts.
+just build
 ```
+
+#### Prepare 
+
+```bash
+just prepare
+```
+
+The `app` directory is populated with **build artifacts**, so everything in the `app` directory with an exception to `.gitkeep` is **gitingored**.
+
+Subdirectories like `app/jobswa` represents built artifacts for specific app (project).
+
+- The code of the project is copied into `code` directory (shallow clone of the git repository).
+- Configuration files are placed into `config` directory (e.g. `railpack-info.json`, `railpack-plan.json`).
+
+`railpack.json` file is copied from root to `app/{project}/code` to be picked up by `railpack prepare` command.
+
+- Using the **command option** with the path to the **config file**: `--config-file railpack.json` does **NOT** work properly.
+
+`Caddyfile` file is copied from root to `app/{project}/code` to be picked up by [Caddy](https://caddyserver.com/) **web server**.
+
+- `Caddyfile` is  [Caddy](https://caddyserver.com/) **configuration format** used by **Caddy web server**.
+- The configuration defined in `Caddyfile` is used by [FrankenPHP](https://frankenphp.dev/) app server running on **Caddy web server**.
+- The `Caddyfile` in use is based on the [Drupal on FrankenPHP](https://github.com/dunglas/frankenphp-drupal) example, link to the `Caddyfile` itself [Port the Apache config to Caddyfile](https://github.com/dunglas/frankenphp-drupal/blob/main/Caddyfile).
+- Read more about: [Caddy](https://wagov-dtt.github.io/dalibor-matura/docs/server/Caddy/]), [Caddyfile](https://wagov-dtt.github.io/dalibor-matura/docs/server/Caddyfile/]) or [FrankenPHP](https://wagov-dtt.github.io/dalibor-matura/docs/language/php/FrankenPHP/).  
+
+#### Clean build artifacts
+
+```bash
+just clean
+```
+
+
 
 ### Use in CI/CD
 
