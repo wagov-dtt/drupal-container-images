@@ -66,6 +66,7 @@ just copy [app_name]
 **a.)** `railpack.json` file is copied **from** root directory **to** `app/{project}/code` directory to be picked up by `railpack prepare` command.
 
 - Copying is necessary as using the **command option** with the path to the **config file**: `railpack prepare --config-file railpack.json` does **NOT** work.
+- It should be possible to **override** the config file **path** being looked in by setting the `RAILPACK_CONFIG_FILE` environment variable to a **path relative to the directory** being built, but it should work very much the same as the `--config-file` **command option**.
 
 **b.)** `Caddyfile` file is copied from root to `app/{project}/code` to be picked up by [Caddy](https://caddyserver.com/) **web server**.
 

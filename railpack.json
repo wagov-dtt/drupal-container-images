@@ -17,7 +17,7 @@
           "dest": "composer.lock"
         },
         {
-          "cmd": "COMPOSER_MEMORY_LIMIT=-1 composer install --ansi --no-interaction --no-scripts --optimize-autoloader --prefer-dist"
+          "cmd": "composer install --ansi --no-interaction --no-scripts --optimize-autoloader --prefer-dist"
         }
       ]
     },
