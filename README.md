@@ -21,32 +21,61 @@
 #### Build Drupal container images for specified app (project)
 
 ```bash
-just build
+just build [app_name]
 ```
+
+**Build** app (project) **container image** based on provided [Railpack](https://railpack.com/) **build plan** supplied to [buildx](https://github.com/docker/buildx) with [BuildKit](https://github.com/moby/buildkit) syntax for [Railpack](https://railpack.com/) **frontend**.
+
+**Execution steps:**
+
+**a.)** 
 
 #### Prepare 
 
 ```bash
-just prepare
+just prepare [app_name]
 ```
 
-The `app` directory is populated with **build artifacts**, so everything in the `app` directory with an exception to `.gitkeep` is **gitingored**.
+**Prepare** a **build plan** for [buildx](https://github.com/docker/buildx) to build **container image**.
 
-Subdirectories like `app/jobswa` represents built artifacts for specific app (project).
+**Execution steps:**
 
-- The code of the project is copied into `code` directory (shallow clone of the git repository).
-- Configuration files are placed into `config` directory (e.g. `railpack-info.json`, `railpack-plan.json`).
+**a.)** The [Railpack](https://railpack.com/) command: `railpack prepare` is run to **analyze**  application **code** and **follow** provided **configuration** (building steps customisation) to generate a **build plan**.
 
-`railpack.json` file is copied from root to `app/{project}/code` to be picked up by `railpack prepare` command.
+#### Copy
 
-- Using the **command option** with the path to the **config file**: `--config-file railpack.json` does **NOT** work properly.
+```bash
+just copy [app_name]
+```
 
-`Caddyfile` file is copied from root to `app/{project}/code` to be picked up by [Caddy](https://caddyserver.com/) **web server**.
 
-- `Caddyfile` is  [Caddy](https://caddyserver.com/) **configuration format** used by **Caddy web server**.
-- The configuration defined in `Caddyfile` is used by [FrankenPHP](https://frankenphp.dev/) app server running on **Caddy web server**.
-- The `Caddyfile` in use is based on the [Drupal on FrankenPHP](https://github.com/dunglas/frankenphp-drupal) example, link to the `Caddyfile` itself [Port the Apache config to Caddyfile](https://github.com/dunglas/frankenphp-drupal/blob/main/Caddyfile).
-- Read more about: [Caddy](https://wagov-dtt.github.io/dalibor-matura/docs/server/Caddy/]), [Caddyfile](https://wagov-dtt.github.io/dalibor-matura/docs/server/Caddyfile/]) or [FrankenPHP](https://wagov-dtt.github.io/dalibor-matura/docs/language/php/FrankenPHP/).  
+**Copy** application **code** and **config files** to be used by [Railpack](https://railpack.com/) to prepare **build plan**.
+
+- The **application** is identified / targeted by **name** `[app_name]` (e.g. `jobswa`).
+
+> [!NOTE]
+> The `app` directory is populated with **build artifacts**, so everything in the `app` directory is **git-ingored** with an exception to `.gitkeep`.
+> 
+> **Subdirectories** like `app/jobswa` contain **build artifacts** for specific app (project).
+> 
+> - The code of the project is copied into `code` directory (shallow clone of the git repository).
+> - Configuration files are placed into `config` directory (e.g. `railpack-info.json`, `railpack-plan.json`).
+
+**Execution steps:**
+
+**a.)** `railpack.json` file is copied **from** root directory **to** `app/{project}/code` directory to be picked up by `railpack prepare` command.
+
+- Copying is necessary as using the **command option** with the path to the **config file**: `railpack prepare --config-file railpack.json` does **NOT** work.
+
+**b.)** `Caddyfile` file is copied from root to `app/{project}/code` to be picked up by [Caddy](https://caddyserver.com/) **web server**.
+
+- `Caddyfile` is  [Caddy](https://caddyserver.com/) **configuration format** used by [Caddy](https://caddyserver.com/)  **web server**.
+- The configuration defined in `Caddyfile` is used by [FrankenPHP](https://frankenphp.dev/) app server running on [Caddy](https://caddyserver.com/) **web server**.
+- The `Caddyfile` in use is based on the [Drupal on FrankenPHP](https://github.com/dunglas/frankenphp-drupal) example (link to the file: [Port the Apache config to Caddyfile](https://github.com/dunglas/frankenphp-drupal/blob/main/Caddyfile)).
+- Read more about: [Caddy](https://wagov-dtt.github.io/dalibor-matura/docs/server/Caddy/]), [Caddyfile](https://wagov-dtt.github.io/dalibor-matura/docs/server/Caddyfile/]) or [FrankenPHP](https://wagov-dtt.github.io/dalibor-matura/docs/language/php/FrankenPHP/).
+
+> [!NOTE]
+> There is a Drupal.org issue: [Add Caddyfile configuration](https://www.drupal.org/project/drupal/issues/3437187) aiming to introduce a `Caddyfile` configuration to enable Drupal to be served by [Caddy](https://caddyserver.com/) and to make it possible to use [FrankenPHP](https://frankenphp.dev/) easily.
 
 #### Clean build artifacts
 
@@ -54,7 +83,15 @@ Subdirectories like `app/jobswa` represents built artifacts for specific app (pr
 just clean
 ```
 
+**Clean** (remove) **artifacts** that were **prepared for** and **generated by** the container image **building process**.
 
+**Execution steps:**
+
+**a.)** Remove **container images** from Docker.
+
+**b.)** Remove unused **Docker data.** 
+
+**c.)** Remove all **build artifacts**.
 
 ### Use in CI/CD
 
