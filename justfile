@@ -31,7 +31,6 @@ build app_name=app_name_default: (prepare app_name)
 prepare app_name=app_name_default: setup (copy app_name)
     @-mkdir {{app_dir}}/{{app_name}}/{{config_dir}}
     railpack prepare "{{app_dir}}/{{app_name}}/{{code_dir}}" \
-        --config-file railpack.json \
         --plan-out {{app_dir}}/{{app_name}}/{{config_dir}}/railpack-plan.json \
         --info-out {{app_dir}}/{{app_name}}/{{config_dir}}/railpack-info.json
 
