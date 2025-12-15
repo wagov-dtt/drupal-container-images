@@ -1,3 +1,7 @@
+[settings]
+# Enable Lockfile: https://mise.jdx.dev/dev-tools/mise-lock.html .
+lockfile = true
+
 [tools]
 caddy = "latest"
 "ubi:railwayapp/railpack" = "latest"
