@@ -10,6 +10,12 @@
 	],
 	"remoteUser": "vscode",
     "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-azuretools.vscode-containers",
+                "redhat.vscode-yaml"
+            ]
+        },
         "jetbrains": {
             "plugins": [
                 "com.github.xepozz.caddy",
