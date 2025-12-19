@@ -37,9 +37,11 @@ prepare app_name=app_name_default tag=tag_default: setup (copy app_name tag)
 
 # Copy app codebase if not coppied already.
 copy app_name=app_name_default tag=tag_default:
+    @echo "⬇️ Pulling down git repository..."
+    @git pull
     @echo "❌ Removing app data, but only if present and the tag has changed..."
     @-tag_previous=$(head -n 1 "{{app_dir}}/{{app_name}}/{{config_dir}}/tag.txt") && \
-        echo $tag_previous && \
+        echo "Previous tag: '$tag_previous', new tag: '{{tag}}'." && \
         [ $tag_previous != "{{tag}}" ] && \
         rm --recursive --force -- {{app_dir}}/{{app_name}}
     @echo "📁 Preparing directories..."
