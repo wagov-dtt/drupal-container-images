@@ -2,6 +2,10 @@
 
 **Drupal container images** to be used for **PROD** and **NPE** environments as well as **local dev** environment.
 
+## Important
+
+- There are some **points** to be reviewed before going to PROD, they are listed in [docs/Review.md](./docs/Review.md).
+
 ## Architecture
 
 **Base**: Dev container: [devcontainer-base](https://github.com/wagov-dtt/devcontainer-base)
@@ -68,15 +72,9 @@ just copy [app_name]
 - Copying is necessary as using the **command option** with the path to the **config file**: `railpack prepare --config-file railpack.json` does **NOT** work.
 - It should be possible to **override** the config file **path** being looked in by setting the `RAILPACK_CONFIG_FILE` environment variable to a **path relative to the directory** being built, but it should work very much the same as the `--config-file` **command option**.
 
-**b.)** `Caddyfile` file is copied from root to `app/{project}/code` to be picked up by [Caddy](https://caddyserver.com/) **web server**.
+**b.)** [Caddyfile](./docs/Caddyfile.md) file is copied from root to `app/{project}/code` to be picked up by [Caddy](https://caddyserver.com/) **web server**.
 
-- `Caddyfile` is  [Caddy](https://caddyserver.com/) **configuration format** used by [Caddy](https://caddyserver.com/)  **web server**.
-- The configuration defined in `Caddyfile` is used by [FrankenPHP](https://frankenphp.dev/) app server running on [Caddy](https://caddyserver.com/) **web server**.
-- The `Caddyfile` in use is based on the [Drupal on FrankenPHP](https://github.com/dunglas/frankenphp-drupal) example (link to the file: [Port the Apache config to Caddyfile](https://github.com/dunglas/frankenphp-drupal/blob/main/Caddyfile)).
-- Read more about: [Caddy](https://wagov-dtt.github.io/dalibor-matura/docs/server/Caddy/]), [Caddyfile](https://wagov-dtt.github.io/dalibor-matura/docs/server/Caddyfile/]) or [FrankenPHP](https://wagov-dtt.github.io/dalibor-matura/docs/language/php/FrankenPHP/).
-
-> [!NOTE]
-> There is a Drupal.org issue: [Add Caddyfile configuration](https://www.drupal.org/project/drupal/issues/3437187) aiming to introduce a `Caddyfile` configuration to enable Drupal to be served by [Caddy](https://caddyserver.com/) and to make it possible to use [FrankenPHP](https://frankenphp.dev/) easily.
+- Read more in [docs/Caddyfile.md](./docs/Caddyfile.md).
 
 #### Clean build artifacts
 
