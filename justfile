@@ -69,9 +69,23 @@ setup:
 # Clean up coppied codebases and built images.
 clean:
     @echo "🧹 Cleaning up..."
+    # Remove containers.
+    # Check first if there are any app subdirectories.
+    @-find "{{app_dir}}"/*/ -maxdepth 0 -empty -type d && \
+        for entry in "{{app_dir}}"/*/; do docker container remove --force `basename "$entry"`; done
     # Remove images.
-    -for entry in "{{app_dir}}"/*/; do docker rmi `basename "$entry"`; done
+    # Check first if there are any app subdirectories.
+    @-find "{{app_dir}}"/*/ -maxdepth 0 -empty -type d && \
+        for entry in "{{app_dir}}"/*/; do docker image rm --force `basename "$entry"`; done
     # Remove unused Docker data.
     docker system prune -f
     # Remove all app artifacts (sub-direcitories) in app directory.
     rm --recursive --force -- {{app_dir}}/*/
+
+# Run container of the built Drupal PROD image.
+run app_name=app_name_default tag="tag_default":
+    docker run \
+      --detach \
+      --publish 8080:80 \
+      --name {{app_name}} \
+      {{app_name}}
