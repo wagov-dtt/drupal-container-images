@@ -12,6 +12,8 @@ The [Drupal CMS with FrankenPHP](https://github.com/wagov-dtt/tutorials-and-work
 
 The **Jobs WA** project is still using **PHP 8.3** and it would have to be **upgraded** in order for us to proceed with **PHP 8.4** when **re-platforming Jobs WA**.
 
+**Adon:** - lets use 8.4 if we can, Drupal 10.4+ seems to support it (so would uplift jobsWA if no major issues spotted), this will allow us to have less testing/more consistency with future wa.gov.au builds.
+
 ### Caddyfile `@protectedFilesRegexp`
 
 The [Caddyfile](../Caddyfile) has a directive `@protectedFilesRegexp` in the `{$SERVER_NAME:localhost}` section. The directive has parameter `path_regexp` with a **regular expression value**.
@@ -31,6 +33,8 @@ The **regualr expression** above contains one **unescaped forward slash** `/` an
 
 What should be the **correct forward slash escaping** in this case **?**
 
+**Adon:** - switch to all escaped fwd slashes, I copypasted the caddyfile basically as is from drupal core but believe they made an error, we should fix.
+
 ### Caddyfile `file_server`
 
 Compared to [Drupal CMS with FrankenPHP](https://github.com/wagov-dtt/tutorials-and-workshops/tree/main/drupal#drupal-cms-with-frankenphp)](https://github.com/wagov-dtt/tutorials-and-workshops/tree/main/s3-pod-identity) example from **Adon**, the project contains also the following `file_server` configuration in its [Caddyfile](../Caddyfile):
@@ -45,6 +49,8 @@ file_server {
 
 Read more about it in **Caddy** documentation: [file_server](https://caddyserver.com/docs/caddyfile/directives/file_server).
 
+**Adon:** - This is just good defaults to avoid unexpected build gotchas (even from modules etc), would keep in.
+
 ### Caddyfile in `.htaccess`
 
 The `Caddyfile` is **protected** from prying eyes in the `.htaccess` modified under **Drupal core** issue: [Add Caddyfile configuration](https://www.drupal.org/project/drupal/issues/3437187) in the **commit**: [add Caddyfile](https://git.drupalcode.org/project/drupal/-/commit/f1d611661998cad5eea3652ac09277433ec08800).
@@ -54,6 +60,9 @@ We probably want to **include this change** either:
 1. As `.htaccess` modification.
 2. Or making the modification part of the **Container Image** building process (amending the `.htaccess` or using other directives).
 3. Or adding it into the [Caddyfile](../Caddyfile)  directive `@protectedFilesRegexp` (not sure if it will work).
+
+**Adon:** - Would include in the 'hide' directives for the file_server above, .htaccess ignored by caddy so wouldn't be worth dropping in there.
+
 
 
 
