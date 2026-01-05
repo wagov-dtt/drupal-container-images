@@ -19,9 +19,9 @@
     order php before file_server
 }
 
-# Listen on port from SERVER_NAME env var, default to :8080.
-{$SERVER_NAME:localhost} {
-    root * {$SERVER_ROOT:/var/www/html/web}
+# Listen on port from SERVER_NAME env var, default to :80.
+:{$SERVER_NAME:localhost} {
+    root * {$SERVER_ROOT:/app/web}
     encode zstd br gzip
 
     # Security: List of files or folders to hide; if requested, the file server will pretend they do not exist.

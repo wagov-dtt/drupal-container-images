@@ -2,6 +2,9 @@
   "$schema": "https://schema.railpack.com",
   "steps": {
     "install:composer": {
+      "variables": {
+        "COMPOSER_MEMORY_LIMIT": "-1"
+      },
       "commands": [
         {
           "image": "composer:latest",
@@ -21,10 +24,19 @@
         }
       ]
     },
+    "prepare": {
+      "variables": {
+        "SERVER_NAME": ":80",
+        "SERVER_ROOT": "/app/web"
+      }
+    },
     "build": {
       "commands": [
         "...",
-        "ln -sf /app/ /var/www/html",
+        {
+          "cmd": "ln -sf /app /var/www/html",
+          "customName": "Make symbolic link from /var/www/html to /app folder."
+        },
         {
           "src": "Caddyfile",
           "dest": "/Caddyfile"
