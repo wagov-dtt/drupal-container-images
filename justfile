@@ -90,7 +90,7 @@ run app_name=app_name_default tag="tag_default":
         --detach \
         --publish 8080:80 \
         --name {{app_name}} \
-        {{app_name}}
+        docker/{{app_name}}:{{tag}}
 
 # Validate Caddyfile.
 validate:

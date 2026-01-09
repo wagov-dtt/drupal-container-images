@@ -37,7 +37,7 @@
 	# more specific rules should come first.
 	# ============================================================
 
-	# Block hidden files/dirs (.git, .env, .htaccess, etc.)
+	# Block hidden files/dirs (.git, .env, .htaccess, etc.).
 	@hidden path /.*
 	error @hidden 403
 
@@ -45,27 +45,31 @@
 	@caddyfile path /Caddyfile */Caddyfile
 	error @caddyfile 403
 
-	# Block PHP execution in dangerous locations
-	@dangerousPhp {
-		path_regexp ^\..*/.*\.php$
-		path_regexp ^/vendor/.*\.php$
-		path_regexp ^/sites/[^/]+/files/.*\.php$
-	}
-	error @dangerousPhp 404
+	# Block PHP execution outside of the web root folder.
+	@dangerousPhpOutsideWebRoot path_regexp ^\..*/.*\.php$
+	error @dangerousPhpOutsideWebRoot 404
 
-	# Block private directories
+	# Block PHP execution of vendor PHP files.
+	@dangerousPhpVendor path_regexp ^/vendor/.*\.php$
+	error @dangerousPhpVendor 404
+
+	# Block PHP execution in files directories.
+	@dangerousPhpFiles path_regexp ^/sites/[^/]+/files/.*\.php$
+	error @dangerousPhpFiles 404
+
+	# Block private directories.
 	@private path_regexp ^/sites/.*/private/
 	error @private 403
 
-	# Block Drupal internal files (modules, themes, configs)
+	# Block Drupal internal files (modules, themes, configs).
 	@internal path_regexp \.(engine|inc|install|make|module|profile|po|sh|theme|twig|tpl|tpl\.php|xtmpl|yml)$
 	error @internal 403
 
-	# Block database dumps, backups, temp files
+	# Block database dumps, backups, temp files.
 	@sensitive path_regexp \.(sql|bak|orig|save|sw[op]|~)$
 	error @sensitive 403
 
-	# Block package manager files
+	# Block package manager files.
 	@packages path /composer.json /composer.lock /package.json /yarn.lock /web.config
 	error @packages 403
 
@@ -73,7 +77,7 @@
 	# CACHING
 	# ============================================================
 
-	# Cache static assets for 1 year (immutable = never revalidate)
+	# Cache static assets for 1 year (immutable = never revalidate).
 	@static {
 		file
 		path *.avif *.css *.eot *.gif *.gz *.ico *.jpg *.jpeg *.js *.otf *.pdf *.png *.svg *.ttf *.webp *.woff *.woff2
