@@ -84,8 +84,16 @@ clean:
 
 # Run container of the built Drupal PROD image.
 run app_name=app_name_default tag="tag_default":
+    @echo "🐋 Running image container in Docker..."
     docker run \
-      --detach \
-      --publish 8080:80 \
-      --name {{app_name}} \
-      {{app_name}}
+        --detach \
+        --publish 8080:80 \
+        --name {{app_name}} \
+        {{app_name}}
+
+# Validate Caddyfile.
+validate:
+    @echo "🔍 Validate Caddyfile..."
+    @echo "Run \`caddy fmt --help\` to understand the validation output and options."
+    caddy fmt --diff Caddyfile
+
