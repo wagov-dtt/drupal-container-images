@@ -1,5 +1,8 @@
 # Drupal container images - Build & Development.
 
+set dotenv-load
+set shell := ["bash", "-lc"]
+
 organisation := "wagov-dtt"
 
 app_dir := "app"
@@ -10,9 +13,37 @@ config_dir := "config"
 
 tag_default := ''
 
+ghcr := "ghcr.io"
+namespace:= "wagov-dtt"
+
 # Show all available commands.
 default:
     @just --list
+
+# Publish to registry (build + push + sign).
+publish app_name=app_name_default tag=tag_default: (build app_name tag)
+    @echo "🚀 Publishing release image..."
+    docker push {{ghcr}}/{{namespace}}/{{app_name}}:{{tag}}
+    @echo "Signing with cosign..."
+    cosign sign --yes {{ghcr}}/{{namespace}}/{{app_name}}:{{tag}}
+
+test:
+    @docker login {{ghcr}} --username $(gh api user --jq .login) --password NONE > /dev/null 2>&1 || echo "Docker is NOT authenticated yet!"
+
+auth:
+    @echo "🔒 Authenticating with GHCR..."
+    echo $GITHUB_TOKEN | docker login {{ghcr}} --username $GITHUB_USER --password-stdin
+
+auth-1password:
+    @echo "🔒 Authenticating with GHCR using 1password..."
+    op run --env-file=".env.local" --no-masking -- just auth-devcontainer
+
+auth-devcontainer:
+    devcontainer exec \
+      --workspace-folder . \
+      --remote-env GITHUB_TOKEN=$GITHUB_TOKEN \
+      --remote-env GITHUB_USER=$(gh api user --jq .login) \
+      -- bash
 
 # Build Drupal PROD image locally.
 build app_name=app_name_default tag=tag_default: (prepare app_name tag)
@@ -98,3 +129,12 @@ validate:
     @echo "Run \`caddy fmt --help\` to understand the validation output and options."
     caddy fmt --diff Caddyfile
 
+# Run in devcontainer with 1Password secrets.
+devcontainer:
+    op run --env-file=".env.local" -- devcontainer up
+
+devcontainer-test:
+    op run --env-file=".env.local" --no-masking -- sh -c 'echo "$GITHUB_TOKEN"'
+
+devcontainer-test2:
+    op run --env-file=".env.local" --no-masking -- sh -c 'devcontainer exec printenv GITHUB_TOKEN'

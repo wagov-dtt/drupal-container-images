@@ -4,4 +4,6 @@ lockfile = true
 
 [tools]
 caddy = "latest"
+cosign = "latest"
+"npm:@devcontainers/cli" = "latest"
 "ubi:railwayapp/railpack" = "latest"
