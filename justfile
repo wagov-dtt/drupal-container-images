@@ -27,23 +27,28 @@ publish app_name=app_name_default tag=tag_default: (build app_name tag)
     @echo "Signing with cosign..."
     cosign sign --yes {{ghcr}}/{{namespace}}/{{app_name}}:{{tag}}
 
-test:
-    @docker login {{ghcr}} --username $(gh api user --jq .login) --password NONE > /dev/null 2>&1 || echo "Docker is NOT authenticated yet!"
-
+# Authenticate docker with GHRC.
 auth:
     @echo "🔒 Authenticating with GHCR..."
+    # Before removing docker config file there was an error:
+    # Error saving credentials: error storing credentials.
+    # @see https://stackoverflow.com/questions/42787779/docker-login-error-storing-credentials-write-permissions-error
+    -@rm ~/.docker/config.json
     echo $GITHUB_TOKEN | docker login {{ghcr}} --username $GITHUB_USER --password-stdin
 
+# Authenticate docker with GHRC using $GITHUB_TOKEN from 1Password.
+# The command should be run from outside of devcontainer on HOST.
 auth-1password:
     @echo "🔒 Authenticating with GHCR using 1password..."
     op run --env-file=".env.local" --no-masking -- just auth-devcontainer
 
+# Inject docker authentication into Dev Container.
 auth-devcontainer:
     devcontainer exec \
       --workspace-folder . \
       --remote-env GITHUB_TOKEN=$GITHUB_TOKEN \
       --remote-env GITHUB_USER=$(gh api user --jq .login) \
-      -- bash
+      -- just auth
 
 # Build Drupal PROD image locally.
 build app_name=app_name_default tag=tag_default: (prepare app_name tag)
