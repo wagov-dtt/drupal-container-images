@@ -62,7 +62,7 @@ build app_name=app_name_default tag=tag_default: (prepare app_name tag)
     docker buildx build \
         --build-arg BUILDKIT_SYNTAX="ghcr.io/railwayapp/railpack-frontend" \
         --file {{app_dir}}/{{app_name}}/{{config_dir}}/railpack-plan.json \
-        --tag docker/{{app_name}}:{{tag}} \
+        --tag {{ghcr}}/{{namespace}}/{{app_name}}:{{tag}} \
         --output type=docker,name={{app_name}} \
         {{app_dir}}/{{app_name}}/{{code_dir}}
 
