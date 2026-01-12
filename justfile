@@ -1,7 +1,8 @@
 # Drupal container images - Build & Development.
 
-set dotenv-load
+set dotenv-load := true
 set shell := ["bash", "-lc"]
+set ignore-comments := true
 
 organisation := "wagov-dtt"
 
@@ -101,6 +102,9 @@ copy app_name=app_name_default tag=tag_default:
 
 # Setup tools.
 setup:
+    @echo "🧰 Setting up Tools..."
+    # Installation alone does not activated the tools in this just recipe sessions.
+    # To activate the newly installed Tools, `just setup` has to be run first as a workaround.
     mise install
 
 # Clean up coppied codebases and built images.
