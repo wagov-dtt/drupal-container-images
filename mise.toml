@@ -1,6 +1,7 @@
 [settings]
 # Enable Lockfile: https://mise.jdx.dev/dev-tools/mise-lock.html .
 lockfile = true
+experimental = true
 
 [tools]
 caddy = "latest"

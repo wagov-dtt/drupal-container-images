@@ -1,0 +1,15 @@
+[[tools.caddy]]
+version = "2.10.2"
+backend = "aqua:caddyserver/caddy"
+
+[[tools.cosign]]
+version = "2.5.3"
+backend = "aqua:sigstore/cosign"
+
+[[tools."npm:@devcontainers/cli"]]
+version = "0.80.1"
+backend = "npm:@devcontainers/cli"
+
+[[tools."ubi:railwayapp/railpack"]]
+version = "0.15.1"
+backend = "ubi:railwayapp/railpack"
