@@ -1,0 +1,111 @@
+group "default" {
+  targets = ["test"]
+}
+
+group "ci" {
+  targets = ["release"]
+}
+
+function "platform" {
+  params = [arch]
+  result = "linux/${arch}"
+}
+
+variable "DATE" {
+  default = ""
+}
+
+variable "REGISTRY" {
+  default = "ghcr.io"
+}
+
+variable "REPOSITORY" {
+  default = "$REPOSITORY"
+}
+
+variable "REPOSITORY_NAMESPACE" {
+  default = "${split("/", "$REPOSITORY")[0]}"
+}
+
+variable "REPOSITORY_NAME" {
+  default = "${split("/", "$REPOSITORY")[1]}"
+}
+
+variable "IMAGE_NAME" {
+  default = "wagov-dtt/$REPOSITORY"
+}
+
+variable "TAGS" {
+  default = "${REPOSITORY_NAME}:latest"
+}
+
+variable "GITHUB_REF_NAME" {
+  default = ""
+}
+
+variable "GITHUB_EVENT_NAME" {
+  default = ""
+}
+
+function "tags" {
+  params = [tags_string]
+  result = [for tag in split("\n", tags_string) : trim(tag, " \t") if trim(tag, " \t") != ""]
+}
+
+function "release_tags" {
+  params = []
+  result = compact([
+    equal(GITHUB_REF_NAME, "main") ? "${REGISTRY}/${IMAGE_NAME}:latest" : "",
+    equal(GITHUB_EVENT_NAME, "schedule") ? "${REGISTRY}/${IMAGE_NAME}:nightly" : "",
+    notequal(GITHUB_REF_NAME, "") ? "${REGISTRY}/${IMAGE_NAME}:${GITHUB_REF_NAME}" : ""
+  ])
+}
+
+variable "ARCH" {
+  default = "amd64"
+}
+
+target "base" {
+  args = {
+    DATE = "${DATE}"
+    BUILDKIT_SYNTAX = "ghcr.io/railwayapp/railpack-frontend"
+  }
+  labels = {
+    "org.opencontainers.image.title" = "${REPOSITORY_NAMESPACE} ${REPOSITORY_NAME}"
+    "org.opencontainers.image.description" = "$REPOSITORY_DESCRIPTION"
+    "org.opencontainers.image.vendor" = "wagov-dtt"
+  }
+  secret     = ["id=GITHUB_TOKEN,env=GITHUB_TOKEN"]
+  provenance = true
+  sbom       = true
+}
+
+# Local development - native platform only
+target "test" {
+  inherits = ["base"]
+  tags     = ["${REPOSITORY_NAME}:test"]
+}
+
+# CI matrix builds - single platform for testing and caching
+target "build-test" {
+  inherits   = ["base"]
+  platforms  = [platform(ARCH)]
+  tags       = notequal(TAGS, "${REPOSITORY_NAME}:latest") && notequal(TAGS, "") ? tags(TAGS) : ["${REPOSITORY_NAME}:test"]
+  cache-from = ["type=gha,scope=${ARCH}"]
+  cache-to   = ["type=gha,mode=max,scope=${ARCH}"]
+}
+
+# CI release - multi-platform with cache from native builds
+target "release" {
+  inherits   = ["base"]
+  platforms  = [platform("amd64"), platform("arm64")]
+  tags       = notequal(TAGS, "${REPOSITORY_NAME}:latest") ? tags(TAGS) : release_tags()
+  attestations = [
+    "type=provenance,mode=max",
+    "type=sbom"
+  ]
+  cache-from = [
+    "type=gha,scope=amd64",
+    "type=gha,scope=arm64"
+  ]
+}
