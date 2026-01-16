@@ -141,9 +141,3 @@ validate:
 # Run in devcontainer with 1Password secrets.
 devcontainer:
     op run --env-file=".env.local" -- devcontainer up
-
-devcontainer-test:
-    op run --env-file=".env.local" --no-masking -- sh -c 'echo "$GITHUB_TOKEN"'
-
-devcontainer-test2:
-    op run --env-file=".env.local" --no-masking -- sh -c 'devcontainer exec printenv GITHUB_TOKEN'
