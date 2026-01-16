@@ -18,50 +18,31 @@ namespace := "wagov-dtt"
 default:
     @just --list
 
-# Publish to registry (build + push + sign).
-publish repository=repository_default tag=tag_default: (build repository tag)
-    @echo "🚀 Publishing release image..."
-    docker push {{ ghcr }}/{{ repository }}:{{ tag }}
-    @echo "Signing with cosign..."
-    cosign sign --yes {{ ghcr }}/{{ repository }}:{{ tag }}
-
-# Authenticate docker with GHRC.
-auth:
-    @echo "🔒 Authenticating with GHCR..."
-    # Before removing docker config file there was an error:
-    # Error saving credentials: error storing credentials.
-    # @see https://stackoverflow.com/questions/42787779/docker-login-error-storing-credentials-write-permissions-error
-    -@rm ~/.docker/config.json
-    echo $GITHUB_TOKEN | docker login {{ ghcr }} --username $GITHUB_USER --password-stdin
-
-# Authenticate docker with GHRC using $GITHUB_TOKEN from 1Password. The command should be run from outside of devcontainer on HOST.
-auth-1password:
-    @echo "🔒 Authenticating with GHCR using 1password..."
-    op run --env-file=".env.local" --no-masking -- just auth-devcontainer
-
-# Inject docker authentication into Dev Container.
-auth-devcontainer:
-    devcontainer exec \
-      --workspace-folder . \
-      --remote-env GITHUB_TOKEN=$GITHUB_TOKEN \
-      --remote-env GITHUB_USER=$(gh api user --jq .login) \
-      -- just auth
-
-# Build Drupal PROD image locally.
+[doc('Build Drupal image.')]
+[group('CI/CD')]
+[group('local')]
+[arg("repository", long="repository")]
+[arg("tag", long="tag")]
+[arg("target", long="target")]
 build repository=repository_default tag=tag_default target=build_target_default: (prepare repository tag)
     @echo "🔨 Building image..."
-    docker buildx bake {{ target }} \
+    REPOSITORY={{ repository }} docker buildx bake {{ target }} \
         --progress=plain \
-        --set="{{ target }}.tags={{ tag }}"
-        {{ app_dir }}/{{ repository }}/{{ code_dir }}
+        --set="{{ target }}.context={{ app_dir }}/{{ repository }}/{{ code_dir }}" \
+        --set="{{ target }}.dockerfile=../{{config_dir}}/railpack-plan.json" \
+        --set="{{ target }}.tags={{ tag }}" \
 
-# Prepare railpack build plan.
+[doc('Prepare railpack build plan.')]
+[group('internal')]
+[arg("repository", long="repository")]
+[arg("tag", long="tag")]
 prepare repository=repository_default tag=tag_default: setup (copy repository tag)
     railpack prepare "{{ app_dir }}/{{ repository }}/{{ code_dir }}" \
         --plan-out {{ app_dir }}/{{ repository }}/{{ config_dir }}/railpack-plan.json \
         --info-out {{ app_dir }}/{{ repository }}/{{ config_dir }}/railpack-info.json
 
-[doc('Copy app codebase if not coppied already')]
+[doc('Copy App codebase if not cached already.')]
+[group('internal')]
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
 copy repository=repository_default tag=tag_default:
@@ -92,14 +73,17 @@ copy repository=repository_default tag=tag_default:
     @echo "📋 Copying docker-bake.hcl to app code..."
     cp docker-bake.hcl {{ app_dir }}/{{ repository }}/{{ code_dir }}
 
-# Setup tools.
+[doc('Setup tools.')]
+[group('CI/CD')]
+[group('local')]
 setup:
     @echo "🧰 Setting up Tools..."
     # Installation alone does not activated the tools in this just recipe sessions.
     # To activate the newly installed Tools, `just setup` has to be run first as a workaround.
     mise install
 
-# Clean up coppied codebases and built images.
+[doc('Clean up coppied codebases and built images.')]
+[group('local')]
 clean:
     @echo "🧹 Cleaning up..."
     # Remove containers.
@@ -115,6 +99,15 @@ clean:
     # Remove all app artifacts (sub-direcitories) in app directory.
     rm --recursive --force -- {{ app_dir }}/*/
 
+[doc('Run validations.')]
+[group('local')]
+validate:
+    @echo "🔍 Validate justfile..."
+    just --fmt --check --unstable
+    @echo "🔍 Validate Caddyfile..."
+    @echo "Run \`caddy fmt --help\` to understand the validation output and options."
+    caddy fmt --diff Caddyfile
+
 # Run container of the built Drupal PROD image.
 run repository=repository_default tag="tag_default":
     @echo "🐋 Running image container in Docker..."
@@ -124,14 +117,35 @@ run repository=repository_default tag="tag_default":
         --name {{ repository }} \
         {{ repository }}:{{ tag }}
 
-# Validate Caddyfile.
-validate:
-    @echo "🔍 Validate justfile..."
-    just --fmt --check --unstable
-    @echo "🔍 Validate Caddyfile..."
-    @echo "Run \`caddy fmt --help\` to understand the validation output and options."
-    caddy fmt --diff Caddyfile
-
 # Run in devcontainer with 1Password secrets.
 devcontainer:
     op run --env-file=".env.local" -- devcontainer up
+
+# Authenticate docker with GHRC.
+auth:
+    @echo "🔒 Authenticating with GHCR..."
+    # Before removing docker config file there was an error:
+    # Error saving credentials: error storing credentials.
+    # @see https://stackoverflow.com/questions/42787779/docker-login-error-storing-credentials-write-permissions-error
+    -@rm ~/.docker/config.json
+    echo $GITHUB_TOKEN | docker login {{ ghcr }} --username $GITHUB_USER --password-stdin
+
+# Authenticate docker with GHRC using $GITHUB_TOKEN from 1Password. The command should be run from outside of devcontainer on HOST.
+auth-1password:
+    @echo "🔒 Authenticating with GHCR using 1password..."
+    op run --env-file=".env.local" --no-masking -- just auth-devcontainer
+
+# Inject docker authentication into Dev Container.
+auth-devcontainer:
+    devcontainer exec \
+      --workspace-folder . \
+      --remote-env GITHUB_TOKEN=$GITHUB_TOKEN \
+      --remote-env GITHUB_USER=$(gh api user --jq .login) \
+      -- just auth
+
+# Publish to registry (build + push + sign).
+publish repository=repository_default tag=tag_default: (build repository tag)
+    @echo "🚀 Publishing release image..."
+    docker push {{ ghcr }}/{{ repository }}:{{ tag }}
+    @echo "Signing with cosign..."
+    cosign sign --yes {{ ghcr }}/{{ repository }}:{{ tag }}
