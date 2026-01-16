@@ -13,6 +13,7 @@ tag_default := ''
 build_target_default := 'test'
 ghcr := "ghcr.io"
 namespace := "wagov-dtt"
+empty := ''
 
 # Show all available commands.
 default:
@@ -24,13 +25,13 @@ default:
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
 [arg("target", long="target")]
-build repository=repository_default tag=tag_default target=build_target_default: (prepare repository tag)
+build repository=repository_default tag=tag_default target=build_target_default push=empty: (prepare repository tag)
     @echo "🔨 Building image..."
     REPOSITORY={{ repository }} docker buildx bake {{ target }} \
         --progress=plain \
         --set="{{ target }}.context={{ app_dir }}/{{ repository }}/{{ code_dir }}" \
         --set="{{ target }}.dockerfile=../{{config_dir}}/railpack-plan.json" \
-        --set="{{ target }}.tags={{ tag }}" \
+        `if [ {{ push }} ]; then echo "--push"; fi`
 
 [doc('Prepare railpack build plan.')]
 [group('internal')]
