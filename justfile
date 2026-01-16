@@ -49,10 +49,11 @@ auth-devcontainer:
 
 # Build Drupal PROD image locally.
 build repository=repository_default tag=tag_default target=build_target_default: (prepare repository tag)
-    @echo "🔨 Building image with `docker buildx bake`..."
+    @echo "🔨 Building image..."
     docker buildx bake {{ target }} \
         --progress=plain \
         --set="{{ target }}.tags={{ tag }}"
+        {{ app_dir }}/{{ repository }}/{{ code_dir }}
 
 # Prepare railpack build plan.
 prepare repository=repository_default tag=tag_default: setup (copy repository tag)
@@ -60,7 +61,9 @@ prepare repository=repository_default tag=tag_default: setup (copy repository ta
         --plan-out {{ app_dir }}/{{ repository }}/{{ config_dir }}/railpack-plan.json \
         --info-out {{ app_dir }}/{{ repository }}/{{ config_dir }}/railpack-info.json
 
-# Copy app codebase if not coppied already.
+[doc('Copy app codebase if not coppied already')]
+[arg("repository", long="repository")]
+[arg("tag", long="tag")]
 copy repository=repository_default tag=tag_default:
     @echo "⬇️ Pulling down git repository..."
     @git pull
@@ -70,8 +73,8 @@ copy repository=repository_default tag=tag_default:
         [ $tag_previous != "{{ tag }}" ] && \
         rm --recursive --force -- {{ app_dir }}/{{ repository }}
     @echo "📁 Preparing directories..."
-    @-mkdir {{ app_dir }}/{{ repository }}
-    @-mkdir {{ app_dir }}/{{ repository }}/{{ config_dir }}
+    @-mkdir --parents {{ app_dir }}/{{ repository }}
+    @-mkdir --parents {{ app_dir }}/{{ repository }}/{{ config_dir }}
     @echo "📝 Writing down tag to file..."
     echo "{{ tag }}" > {{ app_dir }}/{{ repository }}/{{ config_dir }}/tag.txt
     @echo "📋 Copying app code..."
@@ -87,7 +90,7 @@ copy repository=repository_default tag=tag_default:
     @echo "📋 Copying railpack.json to app code..."
     cp railpack.json {{ app_dir }}/{{ repository }}/{{ code_dir }}
     @echo "📋 Copying docker-bake.hcl to app code..."
-    REPOSITORY={{ repository }} envsubst < docker-bake-template.hcl > {{ app_dir }}/{{ repository }}/{{ code_dir }}/docker-bake.hcl
+    cp docker-bake.hcl {{ app_dir }}/{{ repository }}/{{ code_dir }}
 
 # Setup tools.
 setup:

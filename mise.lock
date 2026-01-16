@@ -13,3 +13,6 @@ backend = "npm:@devcontainers/cli"
 [[tools."ubi:railwayapp/railpack"]]
 version = "0.15.1"
 backend = "ubi:railwayapp/railpack"
+
+[tools."ubi:railwayapp/railpack".platforms.linux-x64-railpack]
+checksum = "blake3:e7f7bbe6995b829b79f8c1f1a1caf19fdcec80403e70f149181c7b85fca71dc0"

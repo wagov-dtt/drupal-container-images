@@ -19,20 +19,25 @@ variable "REGISTRY" {
   default = "ghcr.io"
 }
 
+# The ${REPOSITORY} value is expected to be something like: 'wagov-dtt/jobswa'.
 variable "REPOSITORY" {
-  default = "$REPOSITORY"
+  default = ""
+}
+
+variable "REPOSITORY_DESCRIPTION" {
+  default = ""
 }
 
 variable "REPOSITORY_NAMESPACE" {
-  default = "${split("/", "$REPOSITORY")[0]}"
+  default = "${split("/", REPOSITORY)[0]}"
 }
 
 variable "REPOSITORY_NAME" {
-  default = "${split("/", "$REPOSITORY")[1]}"
+  default = "${split("/", REPOSITORY)[1]}"
 }
 
 variable "IMAGE_NAME" {
-  default = "wagov-dtt/$REPOSITORY"
+  default = "${REPOSITORY}"
 }
 
 variable "TAGS" {
@@ -72,8 +77,8 @@ target "base" {
   }
   labels = {
     "org.opencontainers.image.title" = "${REPOSITORY_NAMESPACE} ${REPOSITORY_NAME}"
-    "org.opencontainers.image.description" = "$REPOSITORY_DESCRIPTION"
-    "org.opencontainers.image.vendor" = "wagov-dtt"
+    "org.opencontainers.image.description" = "${REPOSITORY_DESCRIPTION}"
+    "org.opencontainers.image.vendor" = "${REPOSITORY_NAMESPACE}"
   }
   secret     = ["id=GITHUB_TOKEN,env=GITHUB_TOKEN"]
   provenance = true
