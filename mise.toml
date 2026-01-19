@@ -1,10 +1,6 @@
-[settings]
-# Enable Lockfile: https://mise.jdx.dev/dev-tools/mise-lock.html .
-lockfile = true
-experimental = true
-
 [tools]
 caddy = "latest"
 cosign = "latest"
 "npm:@devcontainers/cli" = "latest"
+trivy = "latest"
 "ubi:railwayapp/railpack" = "latest"
