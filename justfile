@@ -36,11 +36,9 @@ build repository=repository_default tag=tag_default target=build_target_default:
 [arg("tag", long="tag")]
 [arg("target", long="target")]
 [doc('Push Drupal image to ECR.')]
-[group('CI/CD')]
 [group('local')]
-build repository=repository_default tag=tag_default target=build_target_default:
+push-ecr repository=repository_default tag=tag_default target=build_target_default:
     @echo "🔨 Pushing image to ECR..."
-
 
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
@@ -181,3 +179,10 @@ aws-sso-login:
 [group('local')]
 aws-sso-logout:
     aws sso logout --profile "$AWS_PROFILE"
+
+[doc('Authenticate Docker client to the Amazon ECR registry.')]
+[group('local')]
+auth-ecr:
+    aws ecr get-login-password --region $AWS_REGION --profile "$AWS_PROFILE" | docker login \
+      --username AWS \
+      --password-stdin $SSO_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com
