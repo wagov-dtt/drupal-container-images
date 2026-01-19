@@ -19,33 +19,33 @@ empty := ''
 default:
     @just --list
 
-[doc('Build Drupal image.')]
-[group('CI/CD')]
-[group('local')]
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
 [arg("target", long="target")]
+[doc('Build Drupal image.')]
+[group('CI/CD')]
+[group('local')]
 build repository=repository_default tag=tag_default target=build_target_default push=empty: (prepare repository tag)
     @echo "🔨 Building image..."
     REPOSITORY={{ repository }} docker buildx bake {{ target }} \
         --progress=plain \
         --set="{{ target }}.context={{ app_dir }}/{{ repository }}/{{ code_dir }}" \
-        --set="{{ target }}.dockerfile=../{{config_dir}}/railpack-plan.json" \
+        --set="{{ target }}.dockerfile=../{{ config_dir }}/railpack-plan.json" \
         `if [ {{ push }} ]; then echo "--push"; fi`
 
-[doc('Prepare railpack build plan.')]
-[group('internal')]
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
+[doc('Prepare railpack build plan.')]
+[group('internal')]
 prepare repository=repository_default tag=tag_default: setup (copy repository tag)
     railpack prepare "{{ app_dir }}/{{ repository }}/{{ code_dir }}" \
         --plan-out {{ app_dir }}/{{ repository }}/{{ config_dir }}/railpack-plan.json \
         --info-out {{ app_dir }}/{{ repository }}/{{ config_dir }}/railpack-info.json
 
-[doc('Copy App codebase if not cached already.')]
-[group('internal')]
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
+[doc('Copy App codebase if not cached already.')]
+[group('internal')]
 copy repository=repository_default tag=tag_default:
     @echo "⬇️ Pulling down git repository..."
     @git pull
@@ -154,16 +154,16 @@ publish repository=repository_default tag=tag_default: (build repository tag)
 [doc('Run AWS SSO Login with provided login profile.')]
 [group('local')]
 aws-login:
-    # aws sts get-caller-identity > /dev/null || aws sso login --use-device-code || echo please run '"aws configure sso"' and add AWS_PROFILE/AWS_REGION to your .env file # make sure aws logged in
+    # You have to configure required environment variables first.
+    # Copy .env.example file to .env and fill in values.
     aws sts get-caller-identity --profile "$AWS_PROFILE" > /dev/null 2>&1 \
         && echo "Profile '$AWS_PROFILE' is active." \
         || (echo "Configuring AWS profile '$AWS_PROFILE' " && \
-        aws configure set sso_start_url "$SSO_START_URL" --profile "$AWS_PROFILE" && \
-        aws configure set sso_region "$SSO_REGION" --profile "$AWS_PROFILE" && \
-        aws configure set sso_registration_scopes "$SSO_REGISTRATION_SCOPE" --profile "$AWS_PROFILE" && \
+        echo -e "$SSO_SESSION\n$SSO_START_URL\n$SSO_REGION\n$SSO_REGISTRATION_SCOPE" | aws configure sso-session && \
+        aws configure set sso_session "$SSO_SESSION" --profile "$AWS_PROFILE" && \
         aws configure set sso_account_id "$SSO_ACCOUNT" --profile "$AWS_PROFILE" && \
         aws configure set sso_role_name "$SSO_ROLE" --profile "$AWS_PROFILE" && \
         aws configure set region "$AWS_REGION" --profile "$AWS_PROFILE" && \
         aws configure set output json --profile "$AWS_PROFILE" && \
         echo "Done configuring profile '$AWS_PROFILE'." && \
-        aws sso login --profile "$AWS_PROFILE")
+        aws sso login --use-device-code --profile "$AWS_PROFILE")
