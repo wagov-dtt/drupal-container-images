@@ -150,3 +150,20 @@ publish repository=repository_default tag=tag_default: (build repository tag)
     docker push {{ ghcr }}/{{ repository }}:{{ tag }}
     @echo "Signing with cosign..."
     cosign sign --yes {{ ghcr }}/{{ repository }}:{{ tag }}
+
+[doc('Run AWS SSO Login with provided login profile.')]
+[group('local')]
+aws-login:
+    # aws sts get-caller-identity > /dev/null || aws sso login --use-device-code || echo please run '"aws configure sso"' and add AWS_PROFILE/AWS_REGION to your .env file # make sure aws logged in
+    aws sts get-caller-identity --profile "$AWS_PROFILE" > /dev/null 2>&1 \
+        && echo "Profile '$AWS_PROFILE' is active." \
+        || (echo "Configuring AWS profile '$AWS_PROFILE' " && \
+        aws configure set sso_start_url "$SSO_START_URL" --profile "$AWS_PROFILE" && \
+        aws configure set sso_region "$SSO_REGION" --profile "$AWS_PROFILE" && \
+        aws configure set sso_registration_scopes "$SSO_REGISTRATION_SCOPE" --profile "$AWS_PROFILE" && \
+        aws configure set sso_account_id "$SSO_ACCOUNT" --profile "$AWS_PROFILE" && \
+        aws configure set sso_role_name "$SSO_ROLE" --profile "$AWS_PROFILE" && \
+        aws configure set region "$AWS_REGION" --profile "$AWS_PROFILE" && \
+        aws configure set output json --profile "$AWS_PROFILE" && \
+        echo "Done configuring profile '$AWS_PROFILE'." && \
+        aws sso login --profile "$AWS_PROFILE")
