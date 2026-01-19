@@ -25,13 +25,22 @@ default:
 [doc('Build Drupal image.')]
 [group('CI/CD')]
 [group('local')]
-build repository=repository_default tag=tag_default target=build_target_default push=empty: (prepare repository tag)
+build repository=repository_default tag=tag_default target=build_target_default: (prepare repository tag)
     @echo "🔨 Building image..."
     REPOSITORY={{ repository }} docker buildx bake {{ target }} \
         --progress=plain \
         --set="{{ target }}.context={{ app_dir }}/{{ repository }}/{{ code_dir }}" \
-        --set="{{ target }}.dockerfile=../{{ config_dir }}/railpack-plan.json" \
-        `if [ {{ push }} ]; then echo "--push"; fi`
+        --set="{{ target }}.dockerfile=../{{ config_dir }}/railpack-plan.json"
+
+[arg("repository", long="repository")]
+[arg("tag", long="tag")]
+[arg("target", long="target")]
+[doc('Push Drupal image to ECR.')]
+[group('CI/CD')]
+[group('local')]
+build repository=repository_default tag=tag_default target=build_target_default:
+    @echo "🔨 Pushing image to ECR..."
+
 
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
@@ -151,9 +160,9 @@ publish repository=repository_default tag=tag_default: (build repository tag)
     @echo "Signing with cosign..."
     cosign sign --yes {{ ghcr }}/{{ repository }}:{{ tag }}
 
-[doc('Run AWS SSO Login with provided login profile.')]
+[doc('Login to AWS while creating AWS SSO login profile.')]
 [group('local')]
-aws-login:
+aws-sso-login:
     # You have to configure required environment variables first.
     # Copy .env.example file to .env and fill in values.
     aws sts get-caller-identity --profile "$AWS_PROFILE" > /dev/null 2>&1 \
@@ -167,3 +176,8 @@ aws-login:
         aws configure set output json --profile "$AWS_PROFILE" && \
         echo "Done configuring profile '$AWS_PROFILE'." && \
         aws sso login --use-device-code --profile "$AWS_PROFILE")
+
+[doc('Logout from AWS SSO login profile.')]
+[group('local')]
+aws-sso-logout:
+    aws sso logout --profile "$AWS_PROFILE"
