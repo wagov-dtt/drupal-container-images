@@ -103,7 +103,7 @@ target "build-test" {
 # CI release - multi-platform with cache from native builds
 target "release" {
   inherits   = ["base"]
-  platforms  = [platform("amd64"), platform("arm64")]
+  platforms  = [platform("amd64")]
   tags       = notequal(TAGS, "${REPOSITORY_NAME}:latest") ? tags(TAGS) : release_tags()
   attestations = [
     "type=provenance,mode=max",
