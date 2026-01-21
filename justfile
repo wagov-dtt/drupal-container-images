@@ -161,6 +161,7 @@ publish repository=repository_default tag=tag_default: (build repository tag)
 [doc('Login to AWS while creating AWS SSO login profile.')]
 [group('local')]
 aws-sso-login:
+    @echo "🔒 Logging in with AWS SSO..."
     # You have to configure required environment variables first.
     # Copy .env.example file to .env and fill in values.
     aws sts get-caller-identity --profile "$AWS_PROFILE" > /dev/null 2>&1 \
@@ -178,11 +179,17 @@ aws-sso-login:
 [doc('Logout from AWS SSO login profile.')]
 [group('local')]
 aws-sso-logout:
+    @echo "🔒 Logging out of AWS SSO..."
     aws sso logout --profile "$AWS_PROFILE"
 
 [doc('Authenticate Docker client to the Amazon ECR registry.')]
 [group('local')]
 auth-ecr:
+    @echo "🔒 Authenticating with Amazon ECR..."
+    # Before removing docker config file there was an error:
+    # Error saving credentials: error storing credentials.
+    # @see https://stackoverflow.com/questions/42787779/docker-login-error-storing-credentials-write-permissions-error
+    -@rm ~/.docker/config.json
     aws ecr get-login-password --region $AWS_REGION --profile "$AWS_PROFILE" | docker login \
       --username AWS \
       --password-stdin $SSO_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com
