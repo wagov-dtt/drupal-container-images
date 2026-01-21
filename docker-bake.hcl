@@ -24,6 +24,10 @@ variable "REPOSITORY" {
   default = ""
 }
 
+variable "TAG" {
+  default = "latest"
+}
+
 variable "REPOSITORY_DESCRIPTION" {
   default = ""
 }
@@ -60,9 +64,7 @@ function "tags" {
 function "release_tags" {
   params = []
   result = compact([
-    equal(GITHUB_REF_NAME, "main") ? "${REGISTRY}/${IMAGE_NAME}:latest" : "",
-    equal(GITHUB_EVENT_NAME, "schedule") ? "${REGISTRY}/${IMAGE_NAME}:nightly" : "",
-    notequal(GITHUB_REF_NAME, "") ? "${REGISTRY}/${IMAGE_NAME}:${GITHUB_REF_NAME}" : ""
+    "${IMAGE_NAME}:${TAG}"
   ])
 }
 

@@ -27,7 +27,7 @@ default:
 [group('local')]
 build repository=repository_default tag=tag_default target=build_target_default: (prepare repository tag)
     @echo "🔨 Building image..."
-    REPOSITORY={{ repository }} docker buildx bake {{ target }} \
+    REPOSITORY={{ repository }} TAG={{ tag }} docker buildx bake {{ target }} \
         --progress=plain \
         --set="{{ target }}.context={{ app_dir }}/{{ repository }}/{{ code_dir }}" \
         --set="{{ target }}.dockerfile=../{{ config_dir }}/railpack-plan.json"
