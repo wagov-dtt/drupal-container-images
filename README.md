@@ -100,42 +100,6 @@ just clean
 
 ## 🔧 Configuration & Adjustments
 
-### Changes to Salsa's repository
-
-#### Modification to composer.json
-
-The following lines have to be added to `composer.json` requirements: 
-
-```json
-"ext-gd": "*",  
-"ext-pdo_mysql": "*",
-```
-
-to look like:
-
-```json
-{
-	"require": {  
-	    ...
-	    "ext-gd": "*",  
-	    "ext-pdo_mysql": "*",
-	    ...
-	}
-}
-```
-
-#### PHP GD extension
-
-The **PHP GD extension** is a powerful **graphics library** integrated with **PHP** and it is required by **Drupal core** / **contrib modules**.
-
-[Drupal PHP requirements]  state that an **image library** for **PHP** such as the [GD library](https://www.php.net/gd) is a **required** extension.
-
-#### PHP MySQL PDO Driver
-
-**PDO MYSQL** is a **driver** that implements the [PHP Data Objects (PDO) interface](https://www.php.net/manual/en/intro.pdo.php) to **enable access** from **PHP** to [MySQL](../../db/Percona-MySQL.md) databases.
-
-[Drupal Database server requirements](https://www.drupal.org/docs/getting-started/system-requirements/database-server-requirements) state that **MYSQL PDO database extension** must be **enabled**.
-
 ### Commands
 
 ```bash
