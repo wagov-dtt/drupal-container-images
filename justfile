@@ -152,6 +152,7 @@ setup:
     # Installation alone does not activated the tools in this just recipe sessions.
     # To activate the newly installed Tools, `just setup` has to be run first as a workaround.
     mise install
+    pre-commit install
 
 [doc('Clean up coppied codebases and built images.')]
 [group('local')]
@@ -178,6 +179,8 @@ validate:
     @echo "🔍 Validate Caddyfile..."
     @echo "Run \`caddy fmt --help\` to understand the validation output and options."
     caddy fmt --diff Caddyfile
+    @echo "Run manually pre-commit hooks on all files."
+    pre-commit run --all-files
 
 # Authenticate docker with GHRC using $GITHUB_TOKEN from 1Password. The command should be run from outside of devcontainer on HOST.
 auth-1password:
@@ -205,7 +208,10 @@ run repository=repository_default tag="tag_default":
         --name {{ repository }} \
         {{ repository }}:{{ tag }}
 
+[arg("target", long="target")]
 [doc('Security scan with Trivy.')]
-scan:
+[group('local')]
+scan target=".":
     @echo "🛡️ Security scanning..."
-    trivy fs --config trivy.yaml .
+    gitleaks git
+    trivy repo --config trivy.yaml {{ target }}
