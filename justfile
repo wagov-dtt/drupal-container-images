@@ -34,14 +34,6 @@ build repository=repository_default tag=tag_default target=build_target_default:
 
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
-[arg("target", long="target")]
-[doc('Push Drupal image to ECR.')]
-[group('local')]
-push-ecr repository=repository_default tag=tag_default target=build_target_default:
-    @echo "🔨 Pushing image to ECR..."
-
-[arg("repository", long="repository")]
-[arg("tag", long="tag")]
 [doc('Prepare railpack build plan.')]
 [group('internal')]
 prepare repository=repository_default tag=tag_default: setup (copy repository tag)
@@ -193,3 +185,14 @@ auth-ecr:
     aws ecr get-login-password --region $AWS_REGION --profile "$AWS_PROFILE" | docker login \
       --username AWS \
       --password-stdin $SSO_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com
+
+[arg("repository", long="repository")]
+[arg("tag", long="tag")]
+[doc('Push Drupal image to ECR.')]
+[group('local')]
+push-ecr repository=repository_default tag=tag_default:
+    @echo "🚀 Publishing  image to ECR..."
+    docker image tag {{ repository }}:{{ tag }} $SSO_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:{{ tag }}
+    docker image push $SSO_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:{{ tag }}
+    @echo "Signing with cosign..."
+    cosign sign --yes $SSO_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:{{ tag }}
