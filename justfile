@@ -73,6 +73,77 @@ copy repository=repository_default tag=tag_default:
     @echo "📋 Copying docker-bake.hcl to app code..."
     cp docker-bake.hcl {{ app_dir }}/{{ repository }}/{{ code_dir }}
 
+[arg("repository", long="repository")]
+[arg("tag", long="tag")]
+[doc('Push Drupal image to ECR.')]
+[group('local')]
+push-ecr repository=repository_default tag=tag_default: (auth-ecr)
+    @echo "🚀 Publishing  image to ECR..."
+    docker image tag {{ repository }}:{{ tag }} $SSO_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:{{ tag }}
+    docker image push $SSO_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:{{ tag }}
+    @echo "Signing with cosign..."
+    cosign sign --yes $SSO_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:{{ tag }}
+
+[doc('Authenticate Docker client to the Amazon ECR registry.')]
+[group('local')]
+auth-ecr:
+    # You have to run aws-sso-login first to authenticate with AWS.
+    @echo "🔒 Authenticating with Amazon ECR..."
+    # Before removing docker config file there was an error:
+    # Error saving credentials: error storing credentials.
+    # @see https://stackoverflow.com/questions/42787779/docker-login-error-storing-credentials-write-permissions-error
+    -@rm ~/.docker/config.json
+    aws ecr get-login-password --region $AWS_REGION --profile "$AWS_PROFILE" | docker login \
+      --username AWS \
+      --password-stdin $SSO_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com
+
+[doc('Login to AWS while creating AWS SSO login profile.')]
+[group('local')]
+aws-sso-login:
+    @echo "🔒 Logging in with AWS SSO..."
+    # You have to configure required environment variables first.
+    # Copy .env.example file to .env and fill in values.
+    aws sts get-caller-identity --profile "$AWS_PROFILE" > /dev/null 2>&1 \
+        && echo "Profile '$AWS_PROFILE' is active." \
+        || (echo "Configuring AWS profile '$AWS_PROFILE' " && \
+        echo -e "$SSO_SESSION\n$SSO_START_URL\n$SSO_REGION\n$SSO_REGISTRATION_SCOPE" | aws configure sso-session && \
+        aws configure set sso_session "$SSO_SESSION" --profile "$AWS_PROFILE" && \
+        aws configure set sso_account_id "$SSO_ACCOUNT" --profile "$AWS_PROFILE" && \
+        aws configure set sso_role_name "$SSO_ROLE" --profile "$AWS_PROFILE" && \
+        aws configure set region "$AWS_REGION" --profile "$AWS_PROFILE" && \
+        aws configure set output json --profile "$AWS_PROFILE" && \
+        echo "Done configuring profile '$AWS_PROFILE'." && \
+        aws sso login --use-device-code --profile "$AWS_PROFILE")
+
+[doc('Logout from AWS SSO login profile.')]
+[group('local')]
+aws-sso-logout:
+    @echo "🔒 Logging out of AWS SSO..."
+    aws sso logout --profile "$AWS_PROFILE"
+
+[arg("repository", long="repository")]
+[arg("tag", long="tag")]
+[doc('Push Drupal image to GHCR.')]
+[group('CI/CD')]
+[group('local')]
+push-ghcr repository=repository_default tag=tag_default: (auth-ghcr)
+    @echo "🚀 Publishing release image..."
+    docker image tag {{ repository }}:{{ tag }} {{ ghcr }}/{{ repository }}:{{ tag }}
+    docker push {{ ghcr }}/{{ repository }}:{{ tag }}
+    @echo "Signing with cosign..."
+    cosign sign --yes {{ ghcr }}/{{ repository }}:{{ tag }}
+
+[doc('Authenticate Docker client to the GHCR registry.')]
+[group('CI/CD')]
+[group('local')]
+auth-ghcr:
+    @echo "🔒 Authenticating with GHCR..."
+    # Before removing docker config file there was an error:
+    # Error saving credentials: error storing credentials.
+    # @see https://stackoverflow.com/questions/42787779/docker-login-error-storing-credentials-write-permissions-error
+    -@rm ~/.docker/config.json
+    echo $GITHUB_TOKEN | docker login {{ ghcr }} --username $GITHUB_USER --password-stdin
+
 [doc('Setup tools.')]
 [group('CI/CD')]
 [group('local')]
@@ -108,28 +179,6 @@ validate:
     @echo "Run \`caddy fmt --help\` to understand the validation output and options."
     caddy fmt --diff Caddyfile
 
-# Run container of the built Drupal PROD image.
-run repository=repository_default tag="tag_default":
-    @echo "🐋 Running image container in Docker..."
-    docker run \
-        --detach \
-        --publish 8080:80 \
-        --name {{ repository }} \
-        {{ repository }}:{{ tag }}
-
-# Run in devcontainer with 1Password secrets.
-devcontainer:
-    op run --env-file=".env.local" -- devcontainer up
-
-# Authenticate docker with GHRC.
-auth:
-    @echo "🔒 Authenticating with GHCR..."
-    # Before removing docker config file there was an error:
-    # Error saving credentials: error storing credentials.
-    # @see https://stackoverflow.com/questions/42787779/docker-login-error-storing-credentials-write-permissions-error
-    -@rm ~/.docker/config.json
-    echo $GITHUB_TOKEN | docker login {{ ghcr }} --username $GITHUB_USER --password-stdin
-
 # Authenticate docker with GHRC using $GITHUB_TOKEN from 1Password. The command should be run from outside of devcontainer on HOST.
 auth-1password:
     @echo "🔒 Authenticating with GHCR using 1password..."
@@ -143,56 +192,15 @@ auth-devcontainer:
       --remote-env GITHUB_USER=$(gh api user --jq .login) \
       -- just auth
 
-# Publish to registry (build + push + sign).
-publish repository=repository_default tag=tag_default: (build repository tag)
-    @echo "🚀 Publishing release image..."
-    docker push {{ ghcr }}/{{ repository }}:{{ tag }}
-    @echo "Signing with cosign..."
-    cosign sign --yes {{ ghcr }}/{{ repository }}:{{ tag }}
+# Run in devcontainer with 1Password secrets.
+devcontainer:
+    op run --env-file=".env.local" -- devcontainer up
 
-[doc('Login to AWS while creating AWS SSO login profile.')]
-[group('local')]
-aws-sso-login:
-    @echo "🔒 Logging in with AWS SSO..."
-    # You have to configure required environment variables first.
-    # Copy .env.example file to .env and fill in values.
-    aws sts get-caller-identity --profile "$AWS_PROFILE" > /dev/null 2>&1 \
-        && echo "Profile '$AWS_PROFILE' is active." \
-        || (echo "Configuring AWS profile '$AWS_PROFILE' " && \
-        echo -e "$SSO_SESSION\n$SSO_START_URL\n$SSO_REGION\n$SSO_REGISTRATION_SCOPE" | aws configure sso-session && \
-        aws configure set sso_session "$SSO_SESSION" --profile "$AWS_PROFILE" && \
-        aws configure set sso_account_id "$SSO_ACCOUNT" --profile "$AWS_PROFILE" && \
-        aws configure set sso_role_name "$SSO_ROLE" --profile "$AWS_PROFILE" && \
-        aws configure set region "$AWS_REGION" --profile "$AWS_PROFILE" && \
-        aws configure set output json --profile "$AWS_PROFILE" && \
-        echo "Done configuring profile '$AWS_PROFILE'." && \
-        aws sso login --use-device-code --profile "$AWS_PROFILE")
-
-[doc('Logout from AWS SSO login profile.')]
-[group('local')]
-aws-sso-logout:
-    @echo "🔒 Logging out of AWS SSO..."
-    aws sso logout --profile "$AWS_PROFILE"
-
-[doc('Authenticate Docker client to the Amazon ECR registry.')]
-[group('local')]
-auth-ecr:
-    @echo "🔒 Authenticating with Amazon ECR..."
-    # Before removing docker config file there was an error:
-    # Error saving credentials: error storing credentials.
-    # @see https://stackoverflow.com/questions/42787779/docker-login-error-storing-credentials-write-permissions-error
-    -@rm ~/.docker/config.json
-    aws ecr get-login-password --region $AWS_REGION --profile "$AWS_PROFILE" | docker login \
-      --username AWS \
-      --password-stdin $SSO_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com
-
-[arg("repository", long="repository")]
-[arg("tag", long="tag")]
-[doc('Push Drupal image to ECR.')]
-[group('local')]
-push-ecr repository=repository_default tag=tag_default:
-    @echo "🚀 Publishing  image to ECR..."
-    docker image tag {{ repository }}:{{ tag }} $SSO_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:{{ tag }}
-    docker image push $SSO_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:{{ tag }}
-    @echo "Signing with cosign..."
-    cosign sign --yes $SSO_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:{{ tag }}
+# Run container of the built Drupal PROD image.
+run repository=repository_default tag="tag_default":
+    @echo "🐋 Running image container in Docker..."
+    docker run \
+        --detach \
+        --publish 8080:80 \
+        --name {{ repository }} \
+        {{ repository }}:{{ tag }}
