@@ -204,3 +204,8 @@ run repository=repository_default tag="tag_default":
         --publish 8080:80 \
         --name {{ repository }} \
         {{ repository }}:{{ tag }}
+
+[doc('Security scan with Trivy.')]
+scan:
+    @echo "🛡️ Security scanning..."
+    trivy fs --config trivy.yaml .

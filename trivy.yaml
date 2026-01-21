@@ -1,0 +1,17 @@
+# Trivy configuration file
+# Documentation: https://trivy.dev/latest/docs/references/configuration/config-file/
+
+scan:
+  detection-priority: "precise"
+  # Default scanners to use.
+  scanners:
+    - secret
+    - vuln
+    - misconfig
+    - license
+  # Skip dirs that distro package checks will cover.
+  skip-dirs:
+    - app
+
+# Timeout configuration.
+timeout: 15m
