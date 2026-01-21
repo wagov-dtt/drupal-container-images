@@ -81,8 +81,8 @@ push-ecr repository=repository_default tag=tag_default: (auth-ecr)
     @echo "🚀 Publishing  image to ECR..."
     docker image tag {{ repository }}:{{ tag }} $SSO_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:{{ tag }}
     docker image push $SSO_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:{{ tag }}
-    @echo "Signing with cosign..."
-    cosign sign --yes $SSO_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:{{ tag }}
+    # @echo "Signing with cosign..."
+    # cosign sign --yes $SSO_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:{{ tag }}
 
 [doc('Authenticate Docker client to the Amazon ECR registry.')]
 [group('local')]
