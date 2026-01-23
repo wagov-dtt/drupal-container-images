@@ -1,0 +1,5 @@
+[tools]
+gitleaks = "latest"
+"npm:@devcontainers/cli" = "latest"
+pre-commit = "latest"
+trivy = "latest"

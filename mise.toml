@@ -1,8 +1,4 @@
 [tools]
 caddy = "latest"
 cosign = "latest"
-gitleaks = "latest"
-"npm:@devcontainers/cli" = "latest"
-pre-commit = "latest"
-trivy = "latest"
 "ubi:railwayapp/railpack" = "latest"

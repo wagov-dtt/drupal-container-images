@@ -36,7 +36,7 @@ build repository=repository_default tag=tag_default target=build_target_default:
 [arg("tag", long="tag")]
 [doc('Prepare railpack build plan.')]
 [group('internal')]
-prepare repository=repository_default tag=tag_default: setup (copy repository tag)
+prepare repository=repository_default tag=tag_default: (copy repository tag)
     railpack prepare "{{ app_dir }}/{{ repository }}/{{ code_dir }}" \
         --plan-out {{ app_dir }}/{{ repository }}/{{ config_dir }}/railpack-plan.json \
         --info-out {{ app_dir }}/{{ repository }}/{{ config_dir }}/railpack-info.json
@@ -77,7 +77,7 @@ copy repository=repository_default tag=tag_default:
 [arg("tag", long="tag")]
 [doc('Push Drupal image to ECR.')]
 [group('local')]
-push-ecr repository=repository_default tag=tag_default: (auth-ecr)
+push-ecr repository=repository_default tag=tag_default: auth-ecr
     @echo "🚀 Publishing  image to ECR..."
     docker image tag {{ repository }}:{{ tag }} $SSO_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:{{ tag }}
     docker image push $SSO_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:{{ tag }}
@@ -126,7 +126,7 @@ aws-sso-logout:
 [doc('Push Drupal image to GHCR.')]
 [group('CI/CD')]
 [group('local')]
-push-ghcr repository=repository_default tag=tag_default: (auth-ghcr)
+push-ghcr repository=repository_default tag=tag_default: auth-ghcr
     @echo "🚀 Publishing release image..."
     docker image tag {{ repository }}:{{ tag }} {{ ghcr }}/{{ repository }}:{{ tag }}
     docker push {{ ghcr }}/{{ repository }}:{{ tag }}
@@ -145,14 +145,24 @@ auth-ghcr:
     echo $GITHUB_TOKEN | docker login {{ ghcr }} --username $GITHUB_USER --password-stdin
 
 [doc('Setup tools.')]
-[group('CI/CD')]
 [group('local')]
-setup:
+setup: install-dev
     @echo "🧰 Setting up Tools..."
     # Installation alone does not activated the tools in this just recipe sessions.
     # To activate the newly installed Tools, `just setup` has to be run first as a workaround.
-    mise install
     pre-commit install
+
+[doc('Install PROD Tools with Mise.')]
+[group('CI/CD')]
+install-prod:
+    @echo "🧰 Installing PROD Tools..."
+    mise install --env prod
+
+[doc('Install DEV Tools with Mise.')]
+[group('local')]
+install-dev:
+    @echo "🧰 Installing DEV Tools..."
+    mise install --env dev
 
 [doc('Clean up coppied codebases and built images.')]
 [group('local')]
