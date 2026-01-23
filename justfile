@@ -46,8 +46,6 @@ prepare repository=repository_default tag=tag_default: (copy repository tag)
 [doc('Copy App codebase if not cached already.')]
 [group('internal')]
 copy repository=repository_default tag=tag_default:
-    @echo "⬇️ Pulling down git repository..."
-    @git pull
     @echo "❌ Removing app data, but only if present and the tag has changed..."
     @-tag_previous=$(head -n 1 "{{ app_dir }}/{{ repository }}/{{ config_dir }}/tag.txt") && \
         echo "Previous tag: '$tag_previous', new tag: '{{ tag }}'." && \
@@ -63,7 +61,7 @@ copy repository=repository_default tag=tag_default:
         git clone \
             --no-depth \
             --branch {{ tag }} \
-            git@github.com:{{ repository }}.git \
+            {{ if env("GITHUB_TOKEN", '') != '' { "oauth2:" + env("GITHUB_TOKEN") } else { "git" } }}@github.com:{{ repository }}.git \
             "{{ app_dir }}/{{ repository }}/{{ code_dir }}"
     @-rm --recursive --force "{{ app_dir }}/{{ repository }}/{{ code_dir }}"/.git
     @echo "📋 Copying Caddyfile to app code..."
@@ -189,6 +187,8 @@ validate:
     @echo "🔍 Validate Caddyfile..."
     @echo "Run \`caddy fmt --help\` to understand the validation output and options."
     caddy fmt --diff Caddyfile
+    @echo "🔍 Validate mise..."
+    mise doctor
     @echo "Run manually pre-commit hooks on all files."
     pre-commit run --all-files
 
