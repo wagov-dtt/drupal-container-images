@@ -14,7 +14,7 @@ build_target_default := 'test'
 ghcr := "ghcr.io"
 namespace := "wagov-dtt"
 empty := ''
-git_creds := env("GITHUB_USER", '') + ":" + env("GITHUB_TOKEN", '')
+git_creds := encode_uri_component(env("GITHUB_USER", '')) + ":" + encode_uri_component(env("GITHUB_TOKEN", ''))
 
 # Show all available commands.
 default:
@@ -62,7 +62,7 @@ copy repository=repository_default tag=tag_default:
         git clone \
             --no-depth \
             --branch {{ tag }} \
-            https://{{ if git_creds != ':' { git_creds } else { "git" } }}@github.com:{{ repository }}.git \
+            {{ if git_creds != ':' { git_creds } else { "git" } }}@github.com:{{ repository }}.git \
             "{{ app_dir }}/{{ repository }}/{{ code_dir }}"
     @-rm --recursive --force "{{ app_dir }}/{{ repository }}/{{ code_dir }}"/.git
     @echo "📋 Copying Caddyfile to app code..."
