@@ -16,24 +16,29 @@ namespace := "wagov-dtt"
 empty := ''
 cicd := 'CICD'
 local := 'local'
+yes := 'yes'
+no := 'no'
 
 # Show all available commands.
 default:
     @just --list
 
 [arg("env", long="env")]
+[arg("push", long="push")]
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
 [arg("target", long="target")]
 [doc('Build Drupal image.')]
 [group('CI/CD')]
 [group('local')]
-build repository=repository_default tag=tag_default env=local target=build_target_default: (prepare repository tag env)
+build repository=repository_default tag=tag_default env=local target=build_target_default push=no: (prepare repository tag env)
     @echo "🔨 Building image..."
     REPOSITORY={{ repository }} TAG={{ tag }} docker buildx bake {{ target }} \
         --progress=plain \
         --set="{{ target }}.context={{ app_dir }}/{{ repository }}/{{ code_dir }}" \
         --set="{{ target }}.dockerfile=../{{ config_dir }}/railpack-plan.json"
+    [ "{{ push }}" != "{{ no }}" ] && \
+        just push-ghcr --repository={{ repository }} --tag={{ tag }}
 
 [arg("env", long="env")]
 [arg("repository", long="repository")]
@@ -164,8 +169,6 @@ push-ghcr repository=repository_default tag=tag_default: auth-ghcr
     @echo "🚀 Publishing release image..."
     docker image tag {{ repository }}:{{ tag }} {{ ghcr }}/{{ repository }}:{{ tag }}
     docker push {{ ghcr }}/{{ repository }}:{{ tag }}
-    @echo "Signing with cosign..."
-    cosign sign --yes {{ ghcr }}/{{ repository }}:{{ tag }}
 
 [doc('Authenticate Docker client to the GHCR registry.')]
 [group('CI/CD')]
