@@ -167,7 +167,6 @@ aws-sso-logout:
 [group('local')]
 push-ghcr repository=repository_default tag=tag_default: auth-ghcr
     @echo "🚀 Publishing release image..."
-    docker image tag {{ repository }}:{{ tag }} {{ ghcr }}/{{ repository }}:{{ tag }}
     docker push {{ ghcr }}/{{ repository }}:{{ tag }}
 
 [doc('Authenticate Docker client to the GHCR registry.')]
