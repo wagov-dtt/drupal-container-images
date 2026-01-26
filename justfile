@@ -50,7 +50,7 @@ prepare repository=repository_default tag=tag_default env=local : (copy reposito
 [arg("tag", long="tag")]
 [doc('Copy App codebase if not cached already.')]
 [group('internal')]
-copy repository=repository_default tag=tag_default env=local: (auth-gh env)
+copy repository=repository_default tag=tag_default env=local:
     @echo "❌ Removing app data, but only if present and the tag has changed..."
     @-tag_previous=$(head -n 1 "{{ app_dir }}/{{ repository }}/{{ config_dir }}/tag.txt") && \
         echo "Previous tag: '$tag_previous', new tag: '{{ tag }}'." && \
@@ -63,11 +63,11 @@ copy repository=repository_default tag=tag_default env=local: (auth-gh env)
     echo "{{ tag }}" > {{ app_dir }}/{{ repository }}/{{ config_dir }}/tag.txt
     @echo "📋 Copying app code..."
     @[ -d "{{ app_dir }}/{{ repository }}/{{ code_dir }}" ] || \
-        git clone \
-            --no-depth \
-            --branch {{ tag }} \
-            {{ if env == local { "git@" } else { "https://" } }}github.com:{{ repository }}.git \
-            "{{ app_dir }}/{{ repository }}/{{ code_dir }}"
+        ( \
+            [ "{{ env }}" != "{{ local }}" ] && \
+            just copy-cicd --repository={{ repository }} --tag={{ tag }} || \
+            just copy-local --repository={{ repository }} --tag={{ tag }} \
+        )
     @-rm --recursive --force "{{ app_dir }}/{{ repository }}/{{ code_dir }}"/.git
     @echo "📋 Copying Caddyfile to app code..."
     cp Caddyfile {{ app_dir }}/{{ repository }}/{{ code_dir }}
@@ -76,17 +76,36 @@ copy repository=repository_default tag=tag_default env=local: (auth-gh env)
     @echo "📋 Copying docker-bake.hcl to app code..."
     cp docker-bake.hcl {{ app_dir }}/{{ repository }}/{{ code_dir }}
 
-[arg("env", long="env")]
+[arg("repository", long="repository")]
+[arg("tag", long="tag")]
+[doc('Copy App codebase using gh repo clone.')]
+[group('internal')]
+copy-cicd repository=repository_default tag=tag_default:
+    @echo "📋 Copying app code with: gh repo clone..."
+    gh repo clone {{ repository }} "{{ app_dir }}/{{ repository }}/{{ code_dir }}" -- \
+        --no-depth \
+        --branch {{ tag }}
+
+[arg("repository", long="repository")]
+[arg("tag", long="tag")]
+[doc('Copy App codebase using git clone.')]
+[group('internal')]
+copy-local repository=repository_default tag=tag_default:
+    @echo "📋 Copying app code with: git clone..."
+    git clone \
+        --no-depth \
+        --branch {{ tag }} \
+        git@github.com:{{ repository }}.git \
+        "{{ app_dir }}/{{ repository }}/{{ code_dir }}"
+
 [doc('Authenticate with GitHub CLI.')]
 [group('internal')]
-auth-gh env=local:
-    @echo "🔒 Authenticating with GitHub CLI if the GITHUB_TOKEN env variable is present..."
+auth-gh:
+    @echo "🔒 Authenticating with GitHub CLI..."
     # The below line is not run as the GITHUB_TOKEN environment variable being present makes gh authenticated already.
     # echo $GITHUB_TOKEN | gh auth login --with-token
     # Configure git to use GitHub CLI as the credential helper for all authenticated hosts.
-    @[ "{{ env }}" != "{{ local }}" ] && \
-      gh auth setup-git || \
-      echo "SSH key should be used for git clone on the local environment!"
+    gh auth setup-git
 
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
