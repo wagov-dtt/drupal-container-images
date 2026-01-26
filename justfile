@@ -14,7 +14,6 @@ build_target_default := 'test'
 ghcr := "ghcr.io"
 namespace := "wagov-dtt"
 empty := ''
-git_creds := encode_uri_component(env("GITHUB_USER", '')) + ":" + encode_uri_component(env("GITHUB_TOKEN", ''))
 
 # Show all available commands.
 default:
@@ -46,7 +45,7 @@ prepare repository=repository_default tag=tag_default: (copy repository tag)
 [arg("tag", long="tag")]
 [doc('Copy App codebase if not cached already.')]
 [group('internal')]
-copy repository=repository_default tag=tag_default:
+copy repository=repository_default tag=tag_default: auth-gh
     @echo "❌ Removing app data, but only if present and the tag has changed..."
     @-tag_previous=$(head -n 1 "{{ app_dir }}/{{ repository }}/{{ config_dir }}/tag.txt") && \
         echo "Previous tag: '$tag_previous', new tag: '{{ tag }}'." && \
@@ -62,7 +61,7 @@ copy repository=repository_default tag=tag_default:
         git clone \
             --no-depth \
             --branch {{ tag }} \
-            {{ if git_creds != ':' { git_creds } else { "git" } }}@github.com:{{ repository }}.git \
+            git@github.com:{{ repository }}.git \
             "{{ app_dir }}/{{ repository }}/{{ code_dir }}"
     @-rm --recursive --force "{{ app_dir }}/{{ repository }}/{{ code_dir }}"/.git
     @echo "📋 Copying Caddyfile to app code..."
@@ -71,6 +70,15 @@ copy repository=repository_default tag=tag_default:
     cp railpack.json {{ app_dir }}/{{ repository }}/{{ code_dir }}
     @echo "📋 Copying docker-bake.hcl to app code..."
     cp docker-bake.hcl {{ app_dir }}/{{ repository }}/{{ code_dir }}
+
+[doc('Authenticate with GitHub CLI.')]
+[group('internal')]
+auth-gh:
+    @echo "🔒 Authenticating with GitHub CLI if the GITHUB_TOKEN env variable is present..."
+    # The below line is not run as the GITHUB_TOKEN environment variable being present makes gh authenticated already.
+    # echo $GITHUB_TOKEN | gh auth login --with-token
+    # Configure git to use GitHub CLI as the credential helper for all authenticated hosts.
+    @[ -v GITHUB_TOKEN ] && gh auth setup-git || echo "GITHUB_TOKEN env variable is missing (required for CI/CD run)!"
 
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
