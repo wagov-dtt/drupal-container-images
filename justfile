@@ -14,38 +14,43 @@ build_target_default := 'test'
 ghcr := "ghcr.io"
 namespace := "wagov-dtt"
 empty := ''
+cicd := 'CICD'
+local := 'local'
 
 # Show all available commands.
 default:
     @just --list
 
+[arg("env", long="env")]
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
 [arg("target", long="target")]
 [doc('Build Drupal image.')]
 [group('CI/CD')]
 [group('local')]
-build repository=repository_default tag=tag_default target=build_target_default: (prepare repository tag)
+build repository=repository_default tag=tag_default env=local target=build_target_default: (prepare repository tag env)
     @echo "🔨 Building image..."
     REPOSITORY={{ repository }} TAG={{ tag }} docker buildx bake {{ target }} \
         --progress=plain \
         --set="{{ target }}.context={{ app_dir }}/{{ repository }}/{{ code_dir }}" \
         --set="{{ target }}.dockerfile=../{{ config_dir }}/railpack-plan.json"
 
+[arg("env", long="env")]
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
 [doc('Prepare railpack build plan.')]
 [group('internal')]
-prepare repository=repository_default tag=tag_default: (copy repository tag)
+prepare repository=repository_default tag=tag_default env=local : (copy repository tag env)
     railpack prepare "{{ app_dir }}/{{ repository }}/{{ code_dir }}" \
         --plan-out {{ app_dir }}/{{ repository }}/{{ config_dir }}/railpack-plan.json \
         --info-out {{ app_dir }}/{{ repository }}/{{ config_dir }}/railpack-info.json
 
+[arg("env", long="env")]
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
 [doc('Copy App codebase if not cached already.')]
 [group('internal')]
-copy repository=repository_default tag=tag_default: auth-gh
+copy repository=repository_default tag=tag_default env=local: (auth-gh env)
     @echo "❌ Removing app data, but only if present and the tag has changed..."
     @-tag_previous=$(head -n 1 "{{ app_dir }}/{{ repository }}/{{ config_dir }}/tag.txt") && \
         echo "Previous tag: '$tag_previous', new tag: '{{ tag }}'." && \
@@ -61,7 +66,7 @@ copy repository=repository_default tag=tag_default: auth-gh
         git clone \
             --no-depth \
             --branch {{ tag }} \
-            git@github.com:{{ repository }}.git \
+            {{ if env == local { "git@" } else { "https://" } }}github.com:{{ repository }}.git \
             "{{ app_dir }}/{{ repository }}/{{ code_dir }}"
     @-rm --recursive --force "{{ app_dir }}/{{ repository }}/{{ code_dir }}"/.git
     @echo "📋 Copying Caddyfile to app code..."
@@ -71,14 +76,17 @@ copy repository=repository_default tag=tag_default: auth-gh
     @echo "📋 Copying docker-bake.hcl to app code..."
     cp docker-bake.hcl {{ app_dir }}/{{ repository }}/{{ code_dir }}
 
+[arg("env", long="env")]
 [doc('Authenticate with GitHub CLI.')]
 [group('internal')]
-auth-gh:
+auth-gh env=local:
     @echo "🔒 Authenticating with GitHub CLI if the GITHUB_TOKEN env variable is present..."
     # The below line is not run as the GITHUB_TOKEN environment variable being present makes gh authenticated already.
     # echo $GITHUB_TOKEN | gh auth login --with-token
     # Configure git to use GitHub CLI as the credential helper for all authenticated hosts.
-    @[ -v GITHUB_TOKEN ] && gh auth setup-git || echo "GITHUB_TOKEN env variable is missing (required for CI/CD run)!"
+    @[ "{{ env }}" != "{{ local }}" ] && \
+      gh auth setup-git || \
+      echo "SSH key should be used for git clone on the local environment!"
 
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
