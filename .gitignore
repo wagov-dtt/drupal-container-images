@@ -9,4 +9,5 @@ app/*
 !app/.gitkeep
 
 # Local environment variables.
+.env
 .env.local
