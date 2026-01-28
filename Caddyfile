@@ -1,5 +1,10 @@
 # FrankenPHP Caddyfile for Drupal.
 #
+# The Caddyfile is an easy way to configure FrankenPHP and the Caddy web server.
+#
+# https://frankenphp.dev/docs/config
+# https://caddyserver.com/docs/caddyfile
+#
 # Validate with: caddy fmt --diff Caddyfile
 {
 	frankenphp {
