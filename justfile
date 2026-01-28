@@ -33,19 +33,21 @@ default:
 [group('local')]
 build repository=repository_default tag=tag_default env=local target=build_target_default push=no: (prepare repository tag env)
     @echo "🔨 Building image..."
+    @[ "{{ push }}" == "{{ no }}" ] && \
+        echo "Push was NOT requested" || \
+        just auth-ghcr
     REPOSITORY={{ repository }} TAG={{ tag }} docker buildx bake {{ target }} \
         --progress=plain \
         --set="{{ target }}.context={{ app_dir }}/{{ repository }}/{{ code_dir }}" \
-        --set="{{ target }}.dockerfile=../{{ config_dir }}/railpack-plan.json"
-    [ "{{ push }}" != "{{ no }}" ] && \
-        just push-ghcr --repository={{ repository }} --tag={{ tag }}
+        --set="{{ target }}.dockerfile=../{{ config_dir }}/railpack-plan.json" \
+        {{ if push != no { "--push" } else { "" } }}
 
 [arg("env", long="env")]
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
 [doc('Prepare railpack build plan.')]
 [group('internal')]
-prepare repository=repository_default tag=tag_default env=local : (copy repository tag env)
+prepare repository=repository_default tag=tag_default env=local: (copy repository tag env)
     railpack prepare "{{ app_dir }}/{{ repository }}/{{ code_dir }}" \
         --plan-out {{ app_dir }}/{{ repository }}/{{ config_dir }}/railpack-plan.json \
         --info-out {{ app_dir }}/{{ repository }}/{{ config_dir }}/railpack-info.json
@@ -102,15 +104,6 @@ copy-local repository=repository_default tag=tag_default:
         --branch {{ tag }} \
         git@github.com:{{ repository }}.git \
         "{{ app_dir }}/{{ repository }}/{{ code_dir }}"
-
-[doc('Authenticate with GitHub CLI.')]
-[group('internal')]
-auth-gh:
-    @echo "🔒 Authenticating with GitHub CLI..."
-    # The below line is not run as the GITHUB_TOKEN environment variable being present makes gh authenticated already.
-    # echo $GITHUB_TOKEN | gh auth login --with-token
-    # Configure git to use GitHub CLI as the credential helper for all authenticated hosts.
-    gh auth setup-git
 
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
