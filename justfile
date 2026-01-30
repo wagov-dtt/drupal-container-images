@@ -6,10 +6,10 @@ set ignore-comments := true
 
 organisation := "wagov-dtt"
 app_dir := "app"
-repository_default := "wagov-dtt/jobswa-clone"
+repository_default := 'wagov-dtt/jobswa-clone'
+tag_default := ''
 code_dir := "code"
 config_dir := "config"
-tag_default := ''
 build_target_default := 'test'
 ghcr := "ghcr.io"
 namespace := "wagov-dtt"
@@ -18,6 +18,8 @@ cicd := 'CICD'
 local := 'local'
 yes := 'yes'
 no := 'no'
+docker_compose_file := 'test/docker-compose.yml'
+drush := '/app/vendor/bin/drush'
 
 # Show all available commands.
 default:
@@ -256,3 +258,61 @@ scan target=".":
     @echo "🛡️ Security scanning..."
     gitleaks git
     trivy repo --config trivy.yaml {{ target }}
+
+[arg("env", long="env")]
+[arg("repository", long="repository")]
+[arg("tag", long="tag")]
+[doc('Test Drupal image.')]
+[group('CI/CD')]
+[group('local')]
+test repository=repository_default tag=tag_default env=local: (docker-compose-up repository tag)
+    @echo "☑️ Testing image..."
+    just drush --repository={{ repository }} --tag={{ tag }} \
+        "site:install --account-name=admin --account-pass=admin --yes"
+
+[arg("repository", long="repository")]
+[arg("tag", long="tag")]
+[doc('Docker composer up.')]
+[private]
+docker-compose-up repository=repository_default tag=tag_default:
+    @echo "🏃‍♂️ Docker compose up..."
+    DRUPAL_IMAGE_NAME={{ repository }} \
+        DRUPAL_IMAGE_TAG={{ tag }} \
+        docker compose --file {{ docker_compose_file }} up --detach
+
+[arg("repository", long="repository")]
+[arg("tag", long="tag")]
+[doc('Docker composer down.')]
+[private]
+docker-compose-down repository=repository_default tag=tag_default:
+    @echo "🏃‍♂️ Docker compose down..."
+    DRUPAL_IMAGE_NAME={{ repository }} \
+        DRUPAL_IMAGE_TAG={{ tag }} \
+        docker compose --file {{ docker_compose_file }} down --remove-orphans --volumes > /dev/null 2>&1;
+
+[arg("repository", long="repository")]
+[arg("tag", long="tag")]
+[doc('Docker composer cli.')]
+[private]
+docker-compose-cli repository=repository_default tag=tag_default +COMMAND='':
+    @echo "🏃‍♂️ Docker compose cli..."
+    DRUPAL_IMAGE_NAME={{ repository }} DRUPAL_IMAGE_TAG={{ tag }} \
+        docker compose --file {{ docker_compose_file }} exec --no-tty drupal bash -c "{{ COMMAND }}"
+
+[arg("repository", long="repository")]
+[arg("tag", long="tag")]
+[doc('Docker composer cli interactive.')]
+[private]
+docker-compose-cli-interactive repository=repository_default tag=tag_default:
+    @echo "🏃‍♂️ Docker compose cli interactive..."
+    DRUPAL_IMAGE_NAME={{ repository }} DRUPAL_IMAGE_TAG={{ tag }} \
+        docker compose --file {{ docker_compose_file }} exec drupal bash
+
+[arg("repository", long="repository")]
+[arg("tag", long="tag")]
+[doc('Run drush command inside drupal container.')]
+[private]
+drush repository=repository_default tag=tag_default +COMMAND='':
+    @echo "🏃‍♂️ Running drush command..."
+    just docker-compose-cli --repository={{ repository }} --tag={{ tag }} \
+        "{{ drush }} {{ COMMAND }}"

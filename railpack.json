@@ -2,7 +2,7 @@
   "$schema": "https://schema.railpack.com",
   "deploy": {
     "aptPackages": [
-      "mysql-client"
+      "default-mysql-client"
     ]
   },
   "steps": {
