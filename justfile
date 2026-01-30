@@ -278,7 +278,7 @@ docker-compose-up repository=repository_default tag=tag_default:
     @echo "🏃‍♂️ Docker compose up..."
     DRUPAL_IMAGE_NAME={{ repository }} \
         DRUPAL_IMAGE_TAG={{ tag }} \
-        docker compose --file {{ docker_compose_file }} up --detach
+        docker compose --file {{ docker_compose_file }} up --detach --wait
 
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]

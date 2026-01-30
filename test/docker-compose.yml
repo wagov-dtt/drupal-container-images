@@ -17,23 +17,26 @@ services:
     # volumes:
     #   - ~/Sites/drupal-container:/var/www/html:rw,delegated
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
 
   mysql:
-    # See: https://hub.docker.com/_/mariadb
-    image: mariadb:10
+    # See: https://hub.docker.com/_/mysql
+    image: mysql:8
     container_name: drupal-mysql
     environment:
-      MARIADB_RANDOM_ROOT_PASSWORD: 'yes'
-      MARIADB_DATABASE: drupal
-      MARIADB_USER: drupal
-      MARIADB_PASSWORD: drupal
+      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+      MYSQL_DATABASE: drupal
+      MYSQL_USER: drupal
+      MYSQL_PASSWORD: drupal
+    healthcheck:
+      # The official image's entrypoint script includes healthcheck logic
+      # that can leverage MYSQL_USER and MYSQL_PASSWORD environment variables.
+      # The $$ escapes the $ for the container's shell.
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u$$MYSQL_USER", "-p$$MYSQL_PASSWORD" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     ports:
       - "3306:3306"
-#    # See: https://hub.docker.com/_/mysql
-#    image: mysql:8
-#    environment:
-#      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
-#      MYSQL_DATABASE: drupal
-#      MYSQL_USER: drupal
-#      MYSQL_PASSWORD: drupal
