@@ -1,0 +1,39 @@
+services:
+  drupal:
+    image: "${DRUPAL_IMAGE_NAME}:${DRUPAL_IMAGE_TAG}"
+    container_name: drupal
+    environment:
+      DB_HOST: drupal-mysql
+      DB_PORT: 3306
+      DB_DATABASE: drupal
+      DB_USERNAME: drupal
+      DB_PASSWORD: drupal
+      TRUSTED_HOST: .*
+    ports:
+      - "80:80"
+    restart: always
+    # Uncomment the volumes line and set to the local path of your Drupal
+    # installation, if you need to work with a local codebase.
+    # volumes:
+    #   - ~/Sites/drupal-container:/var/www/html:rw,delegated
+    depends_on:
+      - mysql
+
+  mysql:
+    # See: https://hub.docker.com/_/mariadb
+    image: mariadb:10
+    container_name: drupal-mysql
+    environment:
+      MARIADB_RANDOM_ROOT_PASSWORD: 'yes'
+      MARIADB_DATABASE: drupal
+      MARIADB_USER: drupal
+      MARIADB_PASSWORD: drupal
+    ports:
+      - "3306:3306"
+#    # See: https://hub.docker.com/_/mysql
+#    image: mysql:8
+#    environment:
+#      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+#      MYSQL_DATABASE: drupal
+#      MYSQL_USER: drupal
+#      MYSQL_PASSWORD: drupal
