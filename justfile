@@ -78,6 +78,10 @@ copy repository=repository_default tag=tag_default env=local:
             just copy-local --repository={{ repository }} --tag={{ tag }} \
         )
     @-rm --recursive --force "{{ app_dir }}/{{ repository }}/{{ code_dir }}"/.git
+    @echo "❌ Removing package.json and package-lock.json to not include Node.js in the build."
+    # At this stage CSS/JS assets are pushed into repository (there's no need to build them).
+    @-rm --force "{{ app_dir }}/{{ repository }}/{{ code_dir }}"/package.json
+    @-rm --force "{{ app_dir }}/{{ repository }}/{{ code_dir }}"/package-lock.json
     @echo "📋 Copying Caddyfile to app code..."
     cp Caddyfile {{ app_dir }}/{{ repository }}/{{ code_dir }}
     @echo "📋 Copying railpack.json to app code..."

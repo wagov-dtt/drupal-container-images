@@ -40,8 +40,8 @@
       "commands": [
         "...",
         {
-          "cmd": "pnpm run dist",
-          "customName": "Rebuild theme CSS/JS assets by running 'dist' script."
+          "cmd": "which pnpm && pnpm run dist",
+          "customName": "At this stage CSS/JS assets are pushed into repository, there's NO need to: Rebuild theme CSS/JS assets by running 'dist' script."
         },
         {
           "cmd": "ln -sf /app /var/www/html",
