@@ -3,6 +3,9 @@
   "deploy": {
     "aptPackages": [
       "default-mysql-client"
+    ],
+    "paths": [
+      "/app/vendor/bin"
     ]
   },
   "steps": {
