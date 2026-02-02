@@ -6,15 +6,6 @@
     ]
   },
   "steps": {
-    "install:node" : {
-      "commands": [
-        "...",
-        {
-          "cmd": "pnpm run dist",
-          "customName": "Rebuild theme CSS/JS assets by running 'dist' script."
-        }
-      ]
-    },
     "install:composer": {
       "variables": {
         "COMPOSER_MEMORY_LIMIT": "-1"
@@ -36,6 +27,10 @@
         {
           "cmd": "composer install --ansi --no-interaction --no-scripts --optimize-autoloader --prefer-dist",
           "customName": "Run composer install."
+        },
+        {
+          "cmd": "pnpm run dist",
+          "customName": "Rebuild theme CSS/JS assets by running 'dist' script."
         }
       ]
     },
