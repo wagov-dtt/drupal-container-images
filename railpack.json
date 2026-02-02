@@ -27,10 +27,6 @@
         {
           "cmd": "composer install --ansi --no-interaction --no-scripts --optimize-autoloader --prefer-dist",
           "customName": "Run composer install."
-        },
-        {
-          "cmd": "pnpm run dist",
-          "customName": "Rebuild theme CSS/JS assets by running 'dist' script."
         }
       ]
     },
@@ -43,6 +39,10 @@
     "build": {
       "commands": [
         "...",
+        {
+          "cmd": "pnpm run dist",
+          "customName": "Rebuild theme CSS/JS assets by running 'dist' script."
+        },
         {
           "cmd": "ln -sf /app /var/www/html",
           "customName": "Make symbolic link from /var/www/html to /app folder."
