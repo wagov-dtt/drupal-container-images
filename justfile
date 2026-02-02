@@ -259,16 +259,30 @@ scan target=".":
     gitleaks git
     trivy repo --config trivy.yaml {{ target }}
 
-[arg("env", long="env")]
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
 [doc('Test Drupal image.')]
 [group('CI/CD')]
 [group('local')]
-test repository=repository_default tag=tag_default env=local: (docker-compose-up repository tag)
+test repository=repository_default tag=tag_default: (docker-compose-up repository tag)
     @echo "☑️ Testing image..."
     just drush --repository={{ repository }} --tag={{ tag }} \
         "site:install --account-name=admin --account-pass=admin --yes"
+
+[arg("db", long="db")]
+[arg("repository", long="repository")]
+[arg("tag", long="tag")]
+[doc('Import DB.')]
+[group('CI/CD')]
+[group('local')]
+test-import-db repository=repository_default tag=tag_default db:
+    @echo "🗃️ Importing DB..."
+    just drush --repository={{ repository }} --tag={{ tag }} \
+        "sql-drop --yes"
+    just drush --repository={{ repository }} --tag={{ tag }} \
+        "sql-cli" < {{ db }}
+    just drush --repository={{ repository }} --tag={{ tag }} \
+        "deploy --yes"
 
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
