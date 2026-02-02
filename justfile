@@ -290,6 +290,14 @@ test-import-db repository=repository_default tag=tag_default db:
 
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
+[doc('Clean Testing artifacts.')]
+[group('CI/CD')]
+[group('local')]
+test-clean repository=repository_default tag=tag_default: (docker-compose-down repository tag)
+    @echo "❌ Cleaning test artifacts..."
+
+[arg("repository", long="repository")]
+[arg("tag", long="tag")]
 [doc('Docker composer up.')]
 [private]
 docker-compose-up repository=repository_default tag=tag_default:
