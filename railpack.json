@@ -2,6 +2,8 @@
   "$schema": "https://schema.railpack.com",
   "deploy": {
     "aptPackages": [
+      "clamav",
+      "clamav-daemon",
       "default-mysql-client"
     ],
     "paths": [
@@ -49,6 +51,19 @@
         {
           "src": "Caddyfile",
           "dest": "/Caddyfile"
+        }
+      ]
+    },
+    "packages:apt:runtime": {
+      "commands": [
+        "...",
+        {
+          "cmd": "freshclam",
+          "customName": "Download and update ClamAV Virus Database."
+        },
+        {
+          "cmd": "service clamav-daemon start",
+          "customName": "Start clamav deamon (clamd)."
         }
       ]
     }
