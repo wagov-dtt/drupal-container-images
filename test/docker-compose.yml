@@ -31,6 +31,8 @@ services:
       MYSQL_DATABASE: drupal
       MYSQL_USER: drupal
       MYSQL_PASSWORD: drupal
+    ports:
+      - "3306:3306"
     healthcheck:
       # The official image's entrypoint script includes healthcheck logic
       # that can leverage MYSQL_USER and MYSQL_PASSWORD environment variables.
@@ -40,13 +42,19 @@ services:
       timeout: 5s
       retries: 3
       start_period: 20s
-    ports:
-      - "3306:3306"
 
   clamav:
-    image: clamav/clamav:latest
+    image: clamav/clamav:1.5.1
+    container_name: clamav
+    environment:
+      CLAMD_CONF_MaxDirectoryRecursion: 30
+      CLAMD_CONF_MaxFileSize: 100M
+      CLAMD_CONF_PCREMaxFileSize: 100M
+      CLAMD_CONF_StreamMaxLength: 100M
+    ports:
+      - "3310:3310"
     volumes:
-      - clamav-socket:/var/run/clamav
+      - clamav-socket:/tmp
 
 volumes:
   clamav-socket: {}

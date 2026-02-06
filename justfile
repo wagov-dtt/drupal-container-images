@@ -272,6 +272,14 @@ scan target=".":
 [group('local')]
 test repository=repository_default tag=tag_default: (docker-compose-up repository tag)
     @echo "☑️ Testing image..."
+
+[arg("repository", long="repository")]
+[arg("tag", long="tag")]
+[doc('Test Drupal image.')]
+[group('CI/CD')]
+[group('local')]
+test-simple-db repository=repository_default tag=tag_default: (docker-compose-up repository tag)
+    @echo "☑️ Testing image..."
     just drush --repository={{ repository }} --tag={{ tag }} \
         "site:install --account-name=admin --account-pass=admin --yes"
 
@@ -281,7 +289,7 @@ test repository=repository_default tag=tag_default: (docker-compose-up repositor
 [doc('Import DB.')]
 [group('CI/CD')]
 [group('local')]
-test-import-db repository=repository_default tag=tag_default db:
+test-import-db repository=repository_default tag=tag_default db:  (docker-compose-up repository tag)
     @echo "🗃️ Importing DB..."
     just drush --repository={{ repository }} --tag={{ tag }} \
         "sql-drop --yes"
