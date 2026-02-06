@@ -1,8 +1,6 @@
 {
   "$schema": "https://schema.railpack.com",
   "buildAptPackages": [
-    "clamav",
-    "clamav-daemon",
     "default-mysql-client"
   ],
   "deploy": {
@@ -44,10 +42,6 @@
     "build": {
       "commands": [
         "...",
-        {
-          "cmd": "freshclam",
-          "customName": "Download and update ClamAV Virus Database."
-        },
         {
           "cmd": "ln -sf /app /var/www/html",
           "customName": "Make symbolic link from /var/www/html to /app folder."
