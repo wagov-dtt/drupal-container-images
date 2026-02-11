@@ -11,8 +11,6 @@ services:
       TRUSTED_HOST: .*
     ports:
       - "80:80"
-    volumes:
-      - clamav-socket:/var/run/clamav
     restart: always
     # Uncomment the volumes line and set to the local path of your Drupal
     # installation, if you need to work with a local codebase.
@@ -42,19 +40,3 @@ services:
       timeout: 5s
       retries: 3
       start_period: 20s
-
-  clamav:
-    image: clamav/clamav:1.5.1
-    container_name: clamav
-    environment:
-      CLAMD_CONF_MaxDirectoryRecursion: 30
-      CLAMD_CONF_MaxFileSize: 100M
-      CLAMD_CONF_PCREMaxFileSize: 100M
-      CLAMD_CONF_StreamMaxLength: 100M
-    ports:
-      - "3310:3310"
-    volumes:
-      - clamav-socket:/tmp
-
-volumes:
-  clamav-socket: {}
