@@ -7,7 +7,7 @@
 	"onCreateCommand": "docker-init.sh && mise install",
   "remoteEnv": {
     "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}",
-    "DOCKER_API_VERSION": "1.43"
+    "DOCKER_API_VERSION": "1.53"
   },
 	"remoteUser": "vscode",
     "customizations": {
