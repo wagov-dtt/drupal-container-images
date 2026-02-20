@@ -21,7 +21,7 @@ no := 'no'
 docker_compose_file := 'test/docker-compose.yml'
 drush := '/app/vendor/bin/drush'
 
-# Show all available commands.
+[doc('Show all available commands.')]
 default:
     @just --list
 
