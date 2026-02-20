@@ -4,11 +4,24 @@
     "default-mysql-client"
   ],
   "deploy": {
+    "base": {
+      "step": "patched-os"
+    },
     "paths": [
       "/app/vendor/bin"
     ]
   },
   "steps": {
+    "patched-os": {
+      "inputs": [
+        {
+          "image": "dunglas/frankenphp:1-php8.4-trixie"
+        }
+      ],
+      "commands": [
+        "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get upgrade -yq && apt-get clean && rm -rf /var/lib/apt/lists/*"
+      ]
+    },
     "install:composer": {
       "variables": {
         "COMPOSER_MEMORY_LIMIT": "-1"
