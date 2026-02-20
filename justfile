@@ -33,7 +33,7 @@ default:
 [doc('Build Drupal image.')]
 [group('CI/CD')]
 [group('local')]
-build repository=repository_default tag=tag_default env=local target=build_target_default push=no: (prepare repository tag env)
+build repository=repository_default tag=tag_default env=local target=build_target_default push=no: (copy repository tag env)
     @echo "🔨 Building image..."
     @[ "{{ push }}" == "{{ no }}" ] && \
         echo "Push was NOT requested" || \
@@ -41,18 +41,7 @@ build repository=repository_default tag=tag_default env=local target=build_targe
     REPOSITORY={{ repository }} TAG={{ tag }} docker buildx bake {{ target }} \
         --progress=plain \
         --set="{{ target }}.context={{ app_dir }}/{{ repository }}/{{ code_dir }}" \
-        --set="{{ target }}.dockerfile=../{{ config_dir }}/railpack-plan.json" \
         {{ if push != no { "--push" } else { "" } }}
-
-[arg("env", long="env")]
-[arg("repository", long="repository")]
-[arg("tag", long="tag")]
-[doc('Prepare railpack build plan.')]
-[group('internal')]
-prepare repository=repository_default tag=tag_default env=local: (copy repository tag env)
-    railpack prepare "{{ app_dir }}/{{ repository }}/{{ code_dir }}" \
-        --plan-out {{ app_dir }}/{{ repository }}/{{ config_dir }}/railpack-plan.json \
-        --info-out {{ app_dir }}/{{ repository }}/{{ config_dir }}/railpack-info.json
 
 [arg("env", long="env")]
 [arg("repository", long="repository")]
@@ -86,10 +75,8 @@ copy repository=repository_default tag=tag_default env=local:
     @-rm --recursive --force "{{ app_dir }}/{{ repository }}/{{ code_dir }}"/.ddev
     @echo "📋 Copying Caddyfile to app code..."
     cp Caddyfile {{ app_dir }}/{{ repository }}/{{ code_dir }}
-    @echo "📋 Copying railpack.json to app code..."
-    cp railpack.json {{ app_dir }}/{{ repository }}/{{ code_dir }}
-    @echo "📋 Copying docker-bake.hcl to app code..."
-    cp docker-bake.hcl {{ app_dir }}/{{ repository }}/{{ code_dir }}
+    @echo "📋 Copying Dockerfile to app code..."
+    cp Dockerfile {{ app_dir }}/{{ repository }}/{{ code_dir }}
 
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
