@@ -2,4 +2,3 @@
 caddy = "latest"
 cosign = "latest"
 gh = "latest"
-"ubi:railwayapp/railpack" = "latest"

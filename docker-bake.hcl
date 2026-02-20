@@ -75,13 +75,14 @@ variable "ARCH" {
 target "base" {
   args = {
     DATE = "${DATE}"
-    BUILDKIT_SYNTAX = "ghcr.io/railwayapp/railpack-frontend"
   }
   labels = {
     "org.opencontainers.image.title" = "${REPOSITORY_NAMESPACE} ${REPOSITORY_NAME}"
     "org.opencontainers.image.description" = "${REPOSITORY_DESCRIPTION}"
     "org.opencontainers.image.vendor" = "${REPOSITORY_NAMESPACE}"
   }
+  context    = "."
+  dockerfile = "Dockerfile"
   secret     = ["id=GITHUB_TOKEN,env=GITHUB_TOKEN"]
   provenance = true
   sbom       = true
