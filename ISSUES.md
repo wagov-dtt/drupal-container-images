@@ -1,6 +1,6 @@
 # High Priority Issues
 
-Review against **grugbrain.dev philosophy** and **OWASP ASVS v4.0.3**.
+Review against **grugbrain.dev philosophy** and **OWASP ASVS v5.0.0**.
 
 **Context:** AWS account separation by app/environment (primary privilege boundary), EKS hosts single app/environment, Drupal with S3 files + Aurora Serverless MySQL.
 
@@ -16,7 +16,7 @@ Review against **grugbrain.dev philosophy** and **OWASP ASVS v4.0.3**.
 
 **Fix:** Pin to specific version: `"image": "composer:2.8.4"`
 
-**Standard:** ASVS V10.2.1, V1.5.1
+**Standard:** ASVS V1.1.1 (Encoding), V10.1.1 (Third-party components)
 
 ---
 
@@ -28,7 +28,7 @@ No GitHub Actions workflows. No automated security scanning.
 
 **Fix:** Add workflow with trivy, gitleaks, SBOM generation, cosign signing
 
-**Standard:** ASVS V1.5.2, V10.2.1
+**Standard:** ASVS V14.2.1 (Build pipeline security)
 
 ---
 
@@ -40,7 +40,7 @@ Test config accepts any host with `.*` regex - could propagate to production.
 
 **Fix:** `TRUSTED_HOST: ^localhost$|^127\.0\.0\.1$`
 
-**Standard:** ASVS V1.5.3, V14.5.2
+**Standard:** ASVS V3.4.2 (CORS), V4.1.3 (Header validation)
 
 ---
 
@@ -61,7 +61,7 @@ rate_limit {
 }
 ```
 
-**Standard:** ASVS V11.1.1, V2.2.1
+**Standard:** ASVS V2.4.1 (Anti-automation), V6.1.1 (Auth documentation), V6.3.1 (Brute force protection)
 
 ---
 
@@ -82,7 +82,7 @@ log {
 
 **Grugbrain:** "grug huge fan of logging and encourage lots of it, especially in cloud deployed"
 
-**Standard:** ASVS V7.1.1
+**Standard:** ASVS V11.2.1 (Security logging)
 
 ---
 
@@ -90,10 +90,10 @@ log {
 
 | # | Issue | Location | Fix | Standard |
 |---|-------|----------|-----|----------|
-| 6 | Missing health check for EKS | test/docker-compose.yml | Add healthcheck with `start_period: 60s` for Aurora cold starts | ASVS V1.2.3 |
-| 7 | Hardcoded PHP config | Caddyfile:11-28 | Use env vars: `{$PHP_MEMORY_LIMIT:256M}` | ASVS V14.3.3 |
-| 8 | Aurora connection resilience | - | Add retry logic, consider ProxySQL for cold starts | ASVS V1.2.3 |
-| 9 | S3 access logging (AWS-level) | AWS config | Enable S3 access logging + CloudTrail data events | ASVS V7.1.2 |
+| 6 | Missing health check for EKS | test/docker-compose.yml | Add healthcheck with `start_period: 60s` for Aurora cold starts | ASVS V14.1.3 (Availability) |
+| 7 | Hardcoded PHP config | Caddyfile:11-28 | Use env vars: `{$PHP_MEMORY_LIMIT:256M}` | ASVS V14.1.1 (Configuration) |
+| 8 | Aurora connection resilience | - | Add retry logic, consider ProxySQL for cold starts | ASVS V14.1.3 (Availability) |
+| 9 | S3 access logging (AWS-level) | AWS config | Enable S3 access logging + CloudTrail data events | ASVS V11.2.2 (Data access logging) |
 
 ---
 
