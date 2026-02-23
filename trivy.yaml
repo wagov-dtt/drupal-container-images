@@ -15,3 +15,7 @@ scan:
 
 # Timeout configuration.
 timeout: 15m
+
+vulnerability:
+  # Only show vulnerabilities with fixes available
+  ignore-unfixed: true
