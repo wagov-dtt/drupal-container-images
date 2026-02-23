@@ -19,7 +19,6 @@ local := 'local'
 yes := 'yes'
 no := 'no'
 docker_compose_file := 'test/docker-compose.yml'
-drush := '/app/vendor/bin/drush'
 
 [doc('Show all available commands.')]
 default:
@@ -74,8 +73,8 @@ copy repository=repository_default tag=tag_default env=local:
     @-rm --force "{{ app_dir }}/{{ repository }}/{{ code_dir }}"/pnpm-lock.yaml
     @echo "❌ Removing .ddev folder."
     @-rm --recursive --force "{{ app_dir }}/{{ repository }}/{{ code_dir }}"/.ddev
-    @echo "📋 Copying Caddyfile to app code..."
-    cp Caddyfile {{ app_dir }}/{{ repository }}/{{ code_dir }}
+    @echo "📋 Copying config folder with config files (e.g. Caddyfile) to app code..."
+    cp -r conf {{ app_dir }}/{{ repository }}/{{ code_dir }}
     @echo "📋 Copying Dockerfile to app code..."
     cp Dockerfile {{ app_dir }}/{{ repository }}/{{ code_dir }}
 
@@ -213,7 +212,7 @@ validate:
     just --fmt --check --unstable
     @echo "🔍 Validate Caddyfile..."
     @echo "Run \`caddy fmt --help\` to understand the validation output and options."
-    caddy fmt --diff Caddyfile
+    caddy fmt --diff conf/Caddyfile
     @echo "🔍 Validate mise..."
     mise doctor
     @echo "Run manually pre-commit hooks on all files."
@@ -281,8 +280,8 @@ test-import-db repository=repository_default tag=tag_default db:  (docker-compos
     @echo "🗃️ Importing DB..."
     just drush --repository={{ repository }} --tag={{ tag }} \
         "sql-drop --yes"
-    just drush --repository={{ repository }} --tag={{ tag }} \
-        "sql-cli" < {{ db }}
+    just docker-compose-cli --repository={{ repository }} --tag={{ tag }} \
+        "$(just drush --repository={{ repository }} --tag={{ tag }} "sql:connect")" < {{ db }}
     just drush --repository={{ repository }} --tag={{ tag }} \
         "deploy --yes"
 
@@ -339,4 +338,4 @@ docker-compose-cli-interactive repository=repository_default tag=tag_default:
 drush repository=repository_default tag=tag_default +COMMAND='':
     @echo "🏃‍♂️ Running drush command..."
     just docker-compose-cli --repository={{ repository }} --tag={{ tag }} \
-        "{{ drush }} {{ COMMAND }}"
+        "drush {{ COMMAND }}"

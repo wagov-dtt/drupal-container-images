@@ -20,6 +20,18 @@ RUN rm -f /etc/apt/apt.conf.d/docker-clean && \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Copy custom configuration file into the MySQL configuration directory
+COPY conf/mysql_disable_ssl.cnf /etc/mysql/conf.d/mysql_disable_ssl.cnf
+
+# Ensure correct file permissions (e.g., 644) if necessary; world-writable files may be ignored
+RUN chmod 644 /etc/mysql/conf.d/mysql_disable_ssl.cnf
+
+# Copy php.ini file
+ADD conf/php.ini /usr/local/etc/php/conf.d/php.ini
+
+# Ensure correct file permissions (e.g., 644) if necessary; world-writable files may be ignored
+RUN chmod 644 /usr/local/etc/php/conf.d/php.ini
+
 # ===========================================
 # PHP extensions stage
 # ===========================================
@@ -98,7 +110,7 @@ FROM php-extensions AS runtime
 WORKDIR /app
 
 # Copy Caddyfile (contains PHP config via php_ini directives)
-COPY Caddyfile /Caddyfile
+COPY conf/Caddyfile /Caddyfile
 
 # Copy built application from build stage
 COPY --from=build /app /app
