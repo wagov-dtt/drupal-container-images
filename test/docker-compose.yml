@@ -9,6 +9,7 @@ services:
       DB_USERNAME: drupal
       DB_PASSWORD: drupal
       TRUSTED_HOST: .*
+      DRUSH_OPTIONS_URI: http://localhost:3000
     ports:
       - "3000:80"
     restart: always
