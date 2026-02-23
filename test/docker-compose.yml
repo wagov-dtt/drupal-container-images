@@ -10,7 +10,7 @@ services:
       DB_PASSWORD: drupal
       TRUSTED_HOST: .*
     ports:
-      - "80:80"
+      - "3000:80"
     restart: always
     # Uncomment the volumes line and set to the local path of your Drupal
     # installation, if you need to work with a local codebase.
@@ -29,8 +29,6 @@ services:
       MYSQL_DATABASE: drupal
       MYSQL_USER: drupal
       MYSQL_PASSWORD: drupal
-    ports:
-      - "3306:3306"
     healthcheck:
       # The official image's entrypoint script includes healthcheck logic
       # that can leverage MYSQL_USER and MYSQL_PASSWORD environment variables.
