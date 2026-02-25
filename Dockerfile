@@ -26,11 +26,17 @@ COPY conf/mysql_disable_ssl.cnf /etc/mysql/conf.d/mysql_disable_ssl.cnf
 # Ensure correct file permissions (e.g., 644) if necessary; world-writable files may be ignored
 RUN chmod 644 /etc/mysql/conf.d/mysql_disable_ssl.cnf
 
-# Copy php.ini file
-ADD conf/php.ini /usr/local/etc/php/conf.d/php.ini
+# Copy default production php.ini file
+RUN cp $PHP_INI_DIR/php.ini-production $PHP_INI_DIR/php.ini
 
 # Ensure correct file permissions (e.g., 644) if necessary; world-writable files may be ignored
-RUN chmod 644 /usr/local/etc/php/conf.d/php.ini
+RUN chmod 644 $PHP_INI_DIR/php.ini
+
+# Copy our custom php.ini overrides to conf.d folder
+ADD conf/php.ini $PHP_INI_DIR/conf.d/php.ini
+
+# Ensure correct file permissions (e.g., 644) if necessary; world-writable files may be ignored
+RUN chmod 644 $PHP_INI_DIR/conf.d/php.ini
 
 # ===========================================
 # PHP extensions stage
@@ -80,7 +86,7 @@ FROM php-extensions AS build
 WORKDIR /app
 
 # Copy composer from official image
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.9.5 /usr/bin/composer /usr/bin/composer
 
 # Set composer environment
 ENV COMPOSER_MEMORY_LIMIT=-1 \
@@ -94,7 +100,7 @@ RUN mkdir -p ${COMPOSER_CACHE_DIR}
 COPY composer.json composer.lock* ./
 
 # Install dependencies (without scripts - they may need full app)
-RUN composer install --no-dev --no-scripts --optimize-autoloader --prefer-dist --no-interaction
+RUN composer install --no-dev --no-scripts --optimize-autoloader --prefer-dist --ansi --no-interaction
 
 # Copy application code
 COPY . .
@@ -122,7 +128,6 @@ ENV PATH="/app/vendor/bin:${PATH}"
 ENV APP_ENV=production \
     APP_DEBUG=false \
     LOG_CHANNEL=stderr \
-    LOG_LEVEL=debug \
     SERVER_NAME=:80 \
     SERVER_ROOT=/app/web
 
