@@ -8,7 +8,7 @@ services:
       DB_DATABASE: drupal
       DB_USERNAME: drupal
       DB_PASSWORD: drupal
-      TRUSTED_HOST: .*
+      TRUSTED_HOST: ^localhost$|^127\.0\.0\.1$
       DRUSH_OPTIONS_URI: http://localhost:3000
     ports:
       - "3000:80"

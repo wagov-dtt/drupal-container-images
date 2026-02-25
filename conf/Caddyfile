@@ -29,6 +29,12 @@
 	}
 	order php_server before file_server
 	order php before file_server
+
+	log default {
+		output stdout
+		format json
+		level INFO
+	}
 }
 
 # SERVER_NAME/SERVER_ROOT set by DDEV or docker run -e.
