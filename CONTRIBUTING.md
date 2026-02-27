@@ -10,7 +10,15 @@ Development guide for working on this repository.
    just setup
    ```
 
-This installs: caddy, cosign, gh, gitleaks, pre-commit, trivy
+Tools are separated by environment:
+
+| Environment | Tools |
+|-------------|-------|
+| **Base** (all) | caddy, cosign |
+| **Dev** (`mise.dev.toml`) | gh, gitleaks, devcontainers/cli, pre-commit, trivy |
+| **Prod** (`mise.prod.toml`) | (none) |
+
+CI/CD uses `just install-prod` for production builds.
 
 ## Architecture
 
