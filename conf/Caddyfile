@@ -41,6 +41,7 @@
 {$SERVER_NAME:localhost} {
 	root * {$SERVER_ROOT:/app/web}
 	encode zstd br gzip
+	log
 
 	# ============================================================
 	# SECURITY RULES
