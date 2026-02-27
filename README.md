@@ -1,131 +1,84 @@
-# Drupal container images
+# Drupal Container Images
 
-**Drupal container images** to be used for **PROD** and **NPE** environments as well as **local dev** environment.
+Production-ready container images for Drupal applications using [FrankenPHP](https://frankenphp.dev/) and [Caddy](https://caddyserver.com/).
 
-## Important
+For development/contributing to this repo, see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
-- There are some **points** to be reviewed before going to PROD, they are listed in [docs/Review.md](./docs/Review.md).
-
-## Architecture
-
-**Base**: Dev container: [devcontainer-base](https://github.com/wagov-dtt/devcontainer-base)
-
-**Package Management**: Hybrid approach - official Debian packages from Dev container + [mise](https://mise.jdx.dev/) for specialized tools.
-
-**Build System**: [Railpack](https://railpack.com/), Docker [BuildKit](https://github.com/moby/buildkit) with docker [buildx](https://github.com/docker/buildx).
-
-**Automation**: [just](https://just.systems/) recipes + GitHub Actions.
-
-### 🔨 Building container images
-
-#### Architecture of PROD container image
-
-[Caddy](https://caddyserver.com/) **web server** running [FrankenPHP](https://frankenphp.dev/), **Modern PHP App Server**, written in **Go**.
-
-#### Build Drupal container images for specified app (project)
+## Quick Start
 
 ```bash
-just build [app_name]
+just build [repository] [tag]
 ```
 
-**Build** app (project) **container image** based on provided [Railpack](https://railpack.com/) **build plan** supplied to [buildx](https://github.com/docker/buildx) with [BuildKit](https://github.com/moby/buildkit) syntax for [Railpack](https://railpack.com/) **frontend**.
+**Example:**
+```bash
+just build wagov-dtt/myapp v1.0.0
+```
 
-**Execution steps:**
+## Requirements
 
-**a.)** ...
+- [Docker](https://docs.docker.com/get-docker/) with BuildKit
+- [just](https://just.systems/) command runner
+- [mise](https://mise.jdx.dev/) (optional, for dev tools)
 
-#### Prepare 
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `just build [repo] [tag]` | Build container image for an app |
+| `just test [repo] [tag]` | Test image with docker-compose |
+| `just test-import-db [repo] [tag] [db.sql]` | Test with database import |
+| `just clean` | Remove build artifacts and images |
+| `just --list` | Show all available commands |
+
+## What's Included
+
+- **FrankenPHP** - Modern PHP application server with worker mode
+- **Caddy** - Automatic HTTPS, sane defaults
+- **PHP 8.4** - With OPcache, JIT, and common Drupal extensions
+- **Composer** - Dependency management
+
+## Configuration
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `SERVER_NAME` | `:80` | Server hostname |
+| `SERVER_ROOT` | `/app/web` | Document root |
+| `DB_HOST` | - | MySQL hostname |
+| `DB_PORT` | `3306` | MySQL port |
+| `DB_DATABASE` | - | Database name |
+| `DB_USERNAME` | - | Database user |
+| `DB_PASSWORD` | - | Database password |
+| `TRUSTED_HOST` | - | Trusted host pattern |
+
+### Custom Config
+
+Place custom files in `conf/`:
+- `Caddyfile` - Web server configuration
+- `php.ini` - PHP settings
+- `mysql_disable_ssl.cnf` - MySQL SSL config
+
+## Testing Locally
 
 ```bash
-just prepare [app_name]
+just build myorg/myapp main
+just test myorg/myapp main
 ```
 
-**Prepare** a **build plan** for [buildx](https://github.com/docker/buildx) to build **container image**.
+Access at http://localhost:3000
 
-**Execution steps:**
+## Security
 
-**a.)** The [Railpack](https://railpack.com/) command: `railpack prepare` is run to **analyze**  application **code** and **follow** provided **configuration** (building steps customisation) to generate a **build plan**.
+See [ISSUES.md](./ISSUES.md) for security checklist before production deployment.
 
-#### Copy
+## Publishing
 
 ```bash
-just copy [app_name]
+just push-ghcr myorg/myapp v1.0.0
 ```
 
+## License
 
-**Copy** application **code** and **config files** to be used by [Railpack](https://railpack.com/) to prepare **build plan**.
-
-- The **application** is identified / targeted by **name** `[app_name]` (e.g. `jobswa`).
-
-> [!NOTE]
-> The `app` directory is populated with **build artifacts**, so everything in the `app` directory is **git-ingored** with an exception to `.gitkeep`.
-> 
-> **Subdirectories** like `app/jobswa` contain **build artifacts** for specific app (project).
-> 
-> - The code of the project is copied into `code` directory (shallow clone of the git repository).
-> - Configuration files are placed into `config` directory (e.g. `railpack-info.json`, `railpack-plan.json`).
-
-**Execution steps:**
-
-**a.)** `railpack.json` file is copied **from** root directory **to** `app/{project}/code` directory to be picked up by `railpack prepare` command.
-
-- Copying is necessary as using the **command option** with the path to the **config file**: `railpack prepare --config-file railpack.json` does **NOT** work.
-- It should be possible to **override** the config file **path** being looked in by setting the `RAILPACK_CONFIG_FILE` environment variable to a **path relative to the directory** being built, but it should work very much the same as the `--config-file` **command option**.
-
-**b.)** [Caddyfile](./docs/Caddyfile.md) file is copied from root to `app/{project}/code` to be picked up by [Caddy](https://caddyserver.com/) **web server**.
-
-- Read more in [docs/Caddyfile.md](./docs/Caddyfile.md).
-
-#### Clean build artifacts
-
-```bash
-just clean
-```
-
-**Clean** (remove) **artifacts** that were **prepared for** and **generated by** the container image **building process**.
-
-**Execution steps:**
-
-**a.)** Remove **container images** from Docker.
-
-**b.)** Remove unused **Docker data.** 
-
-**c.)** Remove all **build artifacts**.
-
-## 📦 Included Tools
-
-**Cloud**: Docker  
-**Development**: Git, [just](https://just.systems/), [mise](https://mise.jdx.dev/)  
-**Security**: Trivy
-
-## 🔧 Configuration & Adjustments
-
-### Commands
-
-```bash
-just build
-just clean
-```
-
-### Customization
-
-...
-
-## Features
-
-**Security**: SBOM generation, signed packages, Trivy scanning, minimal attack surface
-
-### Troubleshooting
-
-- **Tool conflicts**: Run `mise install` to refresh tool installations
-- **Build cache**: Use `just clean` to reset Docker build cache if needed
-
-## Acknowledgments
-
-- [Debian](https://www.debian.org/) - Stable base operating system
-- [Devcontainers](https://containers.dev/) - Development container specification
-- [Docker](https://www.docker.com/) - Container platform and BuildKit
-- [just](https://just.systems/) - Command runner
-- [mise](https://mise.jdx.dev/) - Polyglot tool version manager
-- [Railpack](https://railpack.com/) -  Tool for building images from source code
-
+MIT - See [LICENSE](./LICENSE)
