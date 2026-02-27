@@ -41,7 +41,11 @@
 {$SERVER_NAME:localhost} {
 	root * {$SERVER_ROOT:/app/web}
 	encode zstd br gzip
-	log
+	log app {
+		output stdout
+		format json
+		level INFO
+	}
 
 	# ============================================================
 	# SECURITY RULES

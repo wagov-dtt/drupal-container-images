@@ -105,8 +105,12 @@ RUN composer install --no-dev --no-scripts --optimize-autoloader --prefer-dist -
 # Copy application code
 COPY . .
 
-# Create symbolic link for Drupal
-RUN ln -sf /app /var/www/html
+# Create empty Files folder (which will be overriden by mounted files from S3)
+RUN mkdir /app/web/sites/default/files
+
+# Ensure correct file permissions (e.g., 0775, a+w) if necessary
+# https://www.drupal.org/docs/administering-a-drupal-site/security-in-drupal/securing-file-permissions-and-ownership
+RUN chmod 775 /app/web/sites/default/files
 
 # ===========================================
 # Runtime stage - Final production image
