@@ -12,6 +12,7 @@ scan:
   # Skip dirs that distro package checks will cover.
   skip-dirs:
     - app
+    - test/data
 
 # Timeout configuration.
 timeout: 15m

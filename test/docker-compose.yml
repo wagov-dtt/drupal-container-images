@@ -13,7 +13,7 @@ services:
     ports:
       - "3000:80"
     volumes:
-      - ./files:/app/web/sites/default/files
+      - ./data/files:/app/web/sites/default/files
     restart: always
     # Uncomment the volumes line and set to the local path of your Drupal
     # installation, if you need to work with a local codebase.

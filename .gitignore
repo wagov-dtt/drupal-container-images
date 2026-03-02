@@ -13,4 +13,4 @@ app/*
 .env.local
 
 # Test data.
-test/files
+test/data
