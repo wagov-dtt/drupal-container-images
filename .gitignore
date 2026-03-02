@@ -11,3 +11,6 @@ app/*
 # Local environment variables.
 .env
 .env.local
+
+# Test data.
+test/files
