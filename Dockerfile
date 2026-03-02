@@ -33,7 +33,7 @@ RUN cp $PHP_INI_DIR/php.ini-production $PHP_INI_DIR/php.ini
 RUN chmod 644 $PHP_INI_DIR/php.ini
 
 # Copy our custom php.ini overrides to conf.d folder
-ADD conf/php.ini $PHP_INI_DIR/conf.d/php.ini
+COPY conf/php.ini $PHP_INI_DIR/conf.d/php.ini
 
 # Ensure correct file permissions (e.g., 644) if necessary; world-writable files may be ignored
 RUN chmod 644 $PHP_INI_DIR/conf.d/php.ini
