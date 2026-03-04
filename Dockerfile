@@ -131,7 +131,7 @@ ENV XDG_CONFIG_HOME=/config \
 RUN mkdir -p /config /data && chown -R www-data:www-data /config /data
 
 # Copy Caddyfile with appropriate ownership
-COPY --chown=www-data:www-data conf/Caddyfile /Caddyfile
+COPY --chown=www-data:www-data conf/Caddyfile /config/Caddyfile
 
 # Copy built application from build stage with appropriate ownership
 COPY --chown=www-data:www-data --from=build /app /app
@@ -153,4 +153,4 @@ EXPOSE 8080
 USER www-data
 
 # FrankenPHP's entrypoint already handles starting the server with the Caddyfile
-CMD ["docker-php-entrypoint", "--config", "/Caddyfile", "--adapter", "caddyfile"]
+CMD ["docker-php-entrypoint", "--config", "/config/Caddyfile", "--adapter", "caddyfile"]
