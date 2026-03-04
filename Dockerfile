@@ -105,18 +105,16 @@ RUN composer install --no-dev --no-scripts --optimize-autoloader --prefer-dist -
 # Copy application code
 COPY . .
 
-# Create empty Files folder (which will be overriden by mounted files from S3)
+# Create empty files folder for generated assets, public and private files
+RUN mkdir /app/web/sites/default/generated
 RUN mkdir /app/web/sites/default/files
-
-# Ensure correct file permissions (e.g., 0775, a+w) if necessary
-# https://www.drupal.org/docs/administering-a-drupal-site/security-in-drupal/securing-file-permissions-and-ownership
-RUN chmod 775 /app/web/sites/default/files
-
-# Create empty Files folder (which might be overriden by mounted files from S3)
 RUN mkdir /app/web/sites/default/private
 
-# Ensure correct file permissions (e.g., 660) if necessary
-RUN chmod 660 /app/web/sites/default/private
+# Ensure correct file permissions
+# https://www.drupal.org/docs/administering-a-drupal-site/security-in-drupal/securing-file-permissions-and-ownership
+RUN chmod 775 /app/web/sites/default/generated
+RUN chmod 775 /app/web/sites/default/files
+RUN chmod 750 /app/web/sites/default/private
 
 # ===========================================
 # Runtime stage - Final production image
