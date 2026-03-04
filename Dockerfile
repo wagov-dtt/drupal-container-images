@@ -112,6 +112,12 @@ RUN mkdir /app/web/sites/default/files
 # https://www.drupal.org/docs/administering-a-drupal-site/security-in-drupal/securing-file-permissions-and-ownership
 RUN chmod 775 /app/web/sites/default/files
 
+# Create empty Files folder (which might be overriden by mounted files from S3)
+RUN mkdir /app/web/sites/default/private
+
+# Ensure correct file permissions (e.g., 660) if necessary
+RUN chmod 660 /app/web/sites/default/private
+
 # ===========================================
 # Runtime stage - Final production image
 # ===========================================
