@@ -119,11 +119,16 @@ FROM php-extensions AS runtime
 
 WORKDIR /app
 
-# Copy Caddyfile (contains PHP config via php_ini directives)
-COPY conf/Caddyfile /Caddyfile
+# Set up Caddy config/data directories for non-root execution
+ENV XDG_CONFIG_HOME=/config \
+    XDG_DATA_HOME=/data
+RUN mkdir -p /config /data && chown -R www-data:www-data /config /data
 
-# Copy built application from build stage
-COPY --from=build /app /app
+# Copy Caddyfile with appropriate ownership
+COPY --chown=www-data:www-data conf/Caddyfile /Caddyfile
+
+# Copy built application from build stage with appropriate ownership
+COPY --chown=www-data:www-data --from=build /app /app
 
 # Ensure vendor bin is in PATH for drush
 ENV PATH="/app/vendor/bin:${PATH}"
@@ -132,8 +137,14 @@ ENV PATH="/app/vendor/bin:${PATH}"
 ENV APP_ENV=production \
     APP_DEBUG=false \
     LOG_CHANNEL=stderr \
-    SERVER_NAME=:80 \
+    SERVER_NAME=:8080 \
     SERVER_ROOT=/app/web
+
+# Expose non-privileged port
+EXPOSE 8080
+
+# Switch to non-root user for runtime
+USER www-data
 
 # FrankenPHP's entrypoint already handles starting the server with the Caddyfile
 CMD ["docker-php-entrypoint", "--config", "/Caddyfile", "--adapter", "caddyfile"]
