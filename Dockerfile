@@ -142,7 +142,18 @@ ENV APP_ENV=production \
     APP_DEBUG=false \
     LOG_CHANNEL=stderr \
     SERVER_NAME=:8080 \
-    SERVER_ROOT=/app/web
+    SERVER_ROOT=/app/web \
+    DB_DATABASE=provide_db_name \
+    DB_USERNAME=provide_db_username \
+    DB_PASSWORD=provide_db_password \
+    DB_HOST=provide_db_host \
+    DB_PORT=provide_db_port \
+    TRUSTED_HOST='www\.example\.com' \
+    DRUSH_OPTIONS_URI='https://www.example.com' \
+    SMTP_USERNAME=provide_smtp_username \
+    SMTP_PASSWORD=provide_smtp_password \
+    SMTP_HOST=provide_smtp_host \
+    SMTP_PORT=provide_smtp_port
 
 # Expose non-privileged port
 EXPOSE 8080
