@@ -34,9 +34,6 @@ default:
 [group('local')]
 build repository=repository_default tag=tag_default env=local target=build_target_default push=no: (copy repository tag env)
     @echo "🔨 Building image..."
-    @[ "{{ push }}" == "{{ no }}" ] && \
-        echo "Push was NOT requested" || \
-        just auth-ghcr
     REPOSITORY={{ repository }} TAG={{ tag }} docker buildx bake {{ target }} \
         --progress=plain \
         --set="{{ target }}.context={{ app_dir }}/{{ repository }}/{{ code_dir }}" \
