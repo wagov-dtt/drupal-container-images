@@ -35,6 +35,7 @@ default:
 build repository=repository_default tag=tag_default env=local target=build_target_default push=no: (copy repository tag env)
     @echo "🔨 Building image..."
     REPOSITORY={{ repository }} TAG={{ tag }} docker buildx bake {{ target }} \
+        --pull \
         --progress=plain \
         --set="{{ target }}.context={{ app_dir }}/{{ repository }}/{{ code_dir }}" \
         {{ if push != no { "--push" } else { "" } }}
