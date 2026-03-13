@@ -153,7 +153,8 @@ ENV APP_ENV=production \
     SMTP_USERNAME=provide_smtp_username \
     SMTP_PASSWORD=provide_smtp_password \
     SMTP_HOST=provide_smtp_host \
-    SMTP_PORT=provide_smtp_port
+    SMTP_PORT=provide_smtp_port \
+    SITE_EMAIL=noreply-wa-jobs@www.wa.gov.au
 
 # Expose non-privileged port
 EXPOSE 8080
