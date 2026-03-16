@@ -117,7 +117,7 @@ auth-ecr:
     # Before removing docker config file there was an error:
     # Error saving credentials: error storing credentials.
     # @see https://stackoverflow.com/questions/42787779/docker-login-error-storing-credentials-write-permissions-error
-    -@rm ~/.docker/config.json
+    docker logout
     aws ecr get-login-password --region $AWS_REGION --profile "$AWS_PROFILE" | docker login \
       --username AWS \
       --password-stdin $SSO_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com
