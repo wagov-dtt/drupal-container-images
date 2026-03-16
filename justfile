@@ -49,7 +49,7 @@ copy repository=repository_default tag=tag_default env=local:
     @echo "❌ Removing app data, but only if present and the tag has changed..."
     @-tag_previous=$(head -n 1 "{{ app_dir }}/{{ repository }}/{{ config_dir }}/tag.txt") && \
         echo "Previous tag: '$tag_previous', new tag: '{{ tag }}'." && \
-        [ $tag_previous != "{{ tag }}" ] && \
+        [[ $tag_previous != "{{ tag }}" || "{{ tag }}" == "main" ]] && \
         rm --recursive --force -- {{ app_dir }}/{{ repository }}
     @echo "📁 Preparing directories..."
     @-mkdir --parents {{ app_dir }}/{{ repository }}
