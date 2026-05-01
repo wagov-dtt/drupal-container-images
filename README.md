@@ -38,6 +38,30 @@ just build --repository="wagov-dtt/myapp" --tag="v1.0.0"
 | `just clean` | Remove build artifacts and images |
 | `just --list` | Show all available commands |
 
+## Actions
+
+### Push container image to ECR manually
+
+This process requires couple of **environment variables** (as explained in the first step below).
+
+1. Copy the `.env.example` file to `.env` file and fill in the required **environment variable values**.
+	1. **Required** environment variables:
+		1. `AWS_PROFILE`
+		2. `AWS_REGION`
+		3. `ECR_REPOSITORY`
+	2. All the other environment variables are **optional** as they are only being used by `just aws-sso-login` recipe (which can be skipped if you are using different **AWS authentication process**):
+		1. `SSO_SESSION`
+		2. `SSO_START_URL`
+		3. `SSO_REGION`
+		4. `SSO_REGISTRATION_SCOPE`
+		5. `SSO_ACCOUNT`
+		6. `SSO_ROLE`
+2. **Authenticate** with **AWS** using the appropriate `AWS_PROFILE` and `AWS_REGION`.
+	1. You can use the `just aws-sso-login` recipe if you filled in all the environment variables it requires (marked as optional above, but required by this recipe)
+3. **Push** the **container image** to **ECR** running the `just push-ecr` recipe.
+	1. Recipe template: `just push-ecr --repository=[repository] --tag=[tag]`
+	2. Example with values: `just push-ecr --repository="some/drupal-application" --tag="v1.0.0"`
+
 ## What's Included
 
 - **FrankenPHP** - Modern PHP application server with worker mode
