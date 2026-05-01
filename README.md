@@ -52,24 +52,25 @@ just build --repository="wagov-dtt/myapp" --tag="v1.0.0"
 
 ### Environment Variables
 
-| Variable            | Default                         | Description                                                               |
-| ------------------- | ------------------------------- | ------------------------------------------------------------------------- |
-| `SERVER_NAME`       | `:80`                           | Server hostname                                                           |
-| `SERVER_ROOT`       | `/app/web`                      | Document root                                                             |
-| `DB_HOST`           | -                               | MySQL hostname                                                            |
-| `DB_PORT`           | `3306`                          | MySQL port                                                                |
-| `DB_DATABASE`       | -                               | Database name                                                             |
-| `DB_USERNAME`       | -                               | Database user                                                             |
-| `DB_PASSWORD`       | -                               | Database password                                                         |
-| `TRUSTED_HOST`      | -                               | Trusted host pattern                                                      |
-| `DRUSH_OPTIONS_URI` | -                               | Drupal site URI for Drush CLI commands (required for `uli`, `cron`, etc.) |
-| `APP_ENV`           | `production`                    | Application environment                                                   |
-| `APP_DEBUG`         | `false`                         | Enable debug mode                                                         |
-| `SMTP_USERNAME`     | -                               | SMTP user                                                                 |
-| `SMTP_PASSWORD`     | -                               | SMTP password                                                             |
-| `SMTP_HOST`         | -                               | SMTP hostname                                                             |
-| `SMTP_PORT`         | -                               | SMTP port                                                                 |
-| `SITE_EMAIL`        | `noreply-wa-jobs@www.wa.gov.au` | Drupal website email used as the from email address.                      |
+| Variable                   | Default                         | Description                                                               |
+| -------------------------- | ------------------------------- | ------------------------------------------------------------------------- |
+| `SERVER_NAME`              | `:80`                           | Server hostname                                                           |
+| `SERVER_ROOT`              | `/app/web`                      | Document root                                                             |
+| `DB_HOST`                  | -                               | MySQL hostname                                                            |
+| `DB_PORT`                  | `3306`                          | MySQL port                                                                |
+| `DB_DATABASE`              | -                               | Database name                                                             |
+| `DB_USERNAME`              | -                               | Database user                                                             |
+| `DB_PASSWORD`              | -                               | Database password                                                         |
+| `TRUSTED_HOST`             | -                               | Trusted host pattern                                                      |
+| `DRUSH_OPTIONS_URI`        | -                               | Drupal site URI for Drush CLI commands (required for `uli`, `cron`, etc.) |
+| `APP_ENV`                  | `production`                    | Application environment                                                   |
+| `APP_DEBUG`                | `false`                         | Enable debug mode                                                         |
+| `SMTP_USERNAME`            | -                               | SMTP user                                                                 |
+| `SMTP_PASSWORD`            | -                               | SMTP password                                                             |
+| `SMTP_HOST`                | -                               | SMTP hostname                                                             |
+| `SMTP_PORT`                | -                               | SMTP port                                                                 |
+| `SITE_EMAIL`               | `noreply-wa-jobs@www.wa.gov.au` | Drupal website email used as the from email address.                      |
+| `TRUSTED_REVERSE_PROXY_IP` | -                               | Trusted reverse proxy IP(s), example: `a.b.c.d,e.f.g.h/24`                |
 
 ### Custom Config
 
