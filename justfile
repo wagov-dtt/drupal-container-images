@@ -260,6 +260,12 @@ scan target=".":
 
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
+scan-image repository=repository_default tag=tag_default:
+    @echo "🛡️ Security scanning of container image..."
+    trivy image docker.io/{{ repository }}:{{ tag }}
+
+[arg("repository", long="repository")]
+[arg("tag", long="tag")]
 [doc('Test Drupal image.')]
 [group('CI/CD')]
 [group('local')]

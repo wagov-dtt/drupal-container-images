@@ -1,6 +1,6 @@
 # Drupal Container Images
 
-Production-ready container images for Drupal applications using [FrankenPHP](https://frankenphp.dev/) and [Caddy](https://caddyserver.com/).
+Building process for **production-ready** container images for **Drupal** applications using [FrankenPHP](https://frankenphp.dev/) and [Caddy](https://caddyserver.com/).
 
 For development/contributing to this repo, see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
@@ -61,6 +61,20 @@ This process requires couple of **environment variables** (as explained in the f
 3. **Push** the **container image** to **ECR** running the `just push-ecr` recipe.
 	1. Recipe template: `just push-ecr --repository=[repository] --tag=[tag]`
 	2. Example with values: `just push-ecr --repository="some/drupal-application" --tag="v1.0.0"`
+
+### Scan container image for vulnerabilities
+
+To scan the built container image with [Trivy](https://trivy.dev/) (security scanner) run either:
+
+- `just scan-image --repository="[repository]" --tag="[tag]"`
+- `trivy image [image-identifier]`
+
+Examples:
+
+- `just scan-image --repository="some/drupal-application" --tag="v1.0.0"
+- `trivy image docker.io/some/drupal-application:v1.0.0`
+
+The repository contains **Trivy config file**: `trivy.yaml` that is automatically picked up by the `trivy` command mentioned above (when run from root folder of this repository). The configuration includes instructions like `ignore-unfixed: true` (show only vulnerabilities with fixes available).
 
 ## What's Included
 
