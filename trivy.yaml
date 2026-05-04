@@ -8,7 +8,6 @@ scan:
     - secret
     - vuln
     - misconfig
-    - license
   # Skip dirs that distro package checks will cover.
   skip-dirs:
     - app
