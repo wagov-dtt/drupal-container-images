@@ -16,8 +16,8 @@ namespace := "wagov-dtt"
 empty := ''
 cicd := 'CICD'
 local := 'local'
-yes := 'yes'
-no := 'no'
+true := 'true'
+false := 'false'
 docker_compose_file := 'test/docker-compose.yml'
 
 [doc('Show all available commands.')]
@@ -32,13 +32,13 @@ default:
 [doc('Build Drupal image.')]
 [group('CI/CD')]
 [group('local')]
-build repository=repository_default tag=tag_default env=local target=build_target_default push=no: (copy repository tag env)
+build repository=repository_default tag=tag_default env=local target=build_target_default push=false: (copy repository tag env)
     @echo "🔨 Building image..."
     REPOSITORY={{ repository }} TAG={{ tag }} docker buildx bake {{ target }} \
         --pull \
         --progress=plain \
         --set="{{ target }}.context={{ app_dir }}/{{ repository }}/{{ code_dir }}" \
-        {{ if push != no { "--push" } else { "" } }}
+        {{ if push != false { "--push" } else { "" } }}
 
 [arg("env", long="env")]
 [arg("repository", long="repository")]
@@ -58,11 +58,11 @@ copy repository=repository_default tag=tag_default env=local:
     echo "{{ tag }}" > {{ app_dir }}/{{ repository }}/{{ config_dir }}/tag.txt
     @echo "📋 Copying app code..."
     @[ -d "{{ app_dir }}/{{ repository }}/{{ code_dir }}" ] || \
-        ( \
-            [ "{{ env }}" != "{{ local }}" ] && \
-            just copy-cicd --repository={{ repository }} --tag={{ tag }} || \
-            just copy-local --repository={{ repository }} --tag={{ tag }} \
-        )
+        git clone \
+            --no-depth \
+            --branch {{ tag }} \
+            git@github.com:{{ repository }}.git \
+            "{{ app_dir }}/{{ repository }}/{{ code_dir }}"
     @-rm --recursive --force "{{ app_dir }}/{{ repository }}/{{ code_dir }}"/.git
     @echo "❌ Removing package.json and package-lock.json to not include Node.js in the build."
     # At this stage CSS/JS assets are pushed into repository (there's no need to build them).
@@ -75,28 +75,6 @@ copy repository=repository_default tag=tag_default env=local:
     cp -r conf {{ app_dir }}/{{ repository }}/{{ code_dir }}
     @echo "📋 Copying Dockerfile to app code..."
     cp Dockerfile {{ app_dir }}/{{ repository }}/{{ code_dir }}
-
-[arg("repository", long="repository")]
-[arg("tag", long="tag")]
-[doc('Copy App codebase using gh repo clone.')]
-[group('internal')]
-copy-cicd repository=repository_default tag=tag_default:
-    @echo "📋 Copying app code with: gh repo clone..."
-    gh repo clone {{ repository }} "{{ app_dir }}/{{ repository }}/{{ code_dir }}" -- \
-        --no-depth \
-        --branch {{ tag }}
-
-[arg("repository", long="repository")]
-[arg("tag", long="tag")]
-[doc('Copy App codebase using git clone.')]
-[group('internal')]
-copy-local repository=repository_default tag=tag_default:
-    @echo "📋 Copying app code with: git clone..."
-    git clone \
-        --no-depth \
-        --branch {{ tag }} \
-        git@github.com:{{ repository }}.git \
-        "{{ app_dir }}/{{ repository }}/{{ code_dir }}"
 
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]

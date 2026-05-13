@@ -15,11 +15,7 @@ variable "DATE" {
   default = ""
 }
 
-variable "REGISTRY" {
-  default = "ghcr.io"
-}
-
-# The ${REPOSITORY} value is expected to be something like: 'wagov-dtt/jobswa'.
+# The ${REPOSITORY} value is expected to be something like: 'organization/project'.
 variable "REPOSITORY" {
   default = ""
 }
@@ -46,14 +42,6 @@ variable "IMAGE_NAME" {
 
 variable "TAGS" {
   default = "${REPOSITORY_NAME}:latest"
-}
-
-variable "GITHUB_REF_NAME" {
-  default = ""
-}
-
-variable "GITHUB_EVENT_NAME" {
-  default = ""
 }
 
 function "tags" {
