@@ -86,7 +86,7 @@ FROM php-extensions AS build
 WORKDIR /app
 
 # Copy composer from official image
-COPY --from=composer:2.9.5 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.10.0 /usr/bin/composer /usr/bin/composer
 
 # Set composer environment
 ENV COMPOSER_MEMORY_LIMIT=-1 \
