@@ -101,7 +101,6 @@ target "release" {
     "type=sbom"
   ]
   cache-from = [
-    "type=gha,scope=amd64",
-    "type=gha,scope=arm64"
+    "type=gha,scope=amd64"
   ]
 }
