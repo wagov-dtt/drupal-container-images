@@ -96,10 +96,11 @@ target "release" {
   inherits   = ["base"]
   platforms  = [platform("amd64")]
   tags       = notequal(TAGS, "${REPOSITORY_NAME}:latest") ? tags(TAGS) : release_tags()
-  attestations = [
-    "type=provenance,mode=max",
-    "type=sbom"
-  ]
+  # CRITICAL: Disable attestations that break AWS ECR.
+  provenance = false
+  sbom = false
+  # Force Docker V2 manifest format instead of OCI, required by AWS ECR.
+  output = ["type=image,oci-mediatypes=false"]
   cache-from = [
     "type=gha,scope=amd64"
   ]
