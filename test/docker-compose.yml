@@ -1,3 +1,4 @@
+name: drupal-container-images-test
 services:
   drupal:
     image: "${DRUPAL_IMAGE_NAME}:${DRUPAL_IMAGE_TAG}"

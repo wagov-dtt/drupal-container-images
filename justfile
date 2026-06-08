@@ -4,15 +4,13 @@ set dotenv-load := true
 set shell := ["bash", "-lc"]
 set ignore-comments := true
 
-organisation := "wagov-dtt"
 app_dir := "app"
-repository_default := 'wagov-dtt/jobswa-clone'
+repository_default := ''
 tag_default := ''
 code_dir := "code"
 config_dir := "config"
 build_target_default := 'release'
 ghcr := "ghcr.io"
-namespace := "wagov-dtt"
 empty := ''
 cicd := 'CICD'
 local := 'local'
@@ -29,7 +27,7 @@ default:
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
 [arg("target", long="target")]
-[doc('Build Drupal image.')]
+[doc('Build Drupal container image.')]
 [group('CI/CD')]
 [group('local')]
 build repository=repository_default tag=tag_default env=local target=build_target_default push=false: (copy repository tag env)
@@ -114,7 +112,7 @@ push-ecr repository=repository_default tag=tag_default: auth-ecr
 [doc('Pull Drupal image to ECR.')]
 [group('local')]
 pull-ecr repository=repository_default tag=tag_default: auth-ecr
-    @echo "⬇️ Pulling image to ECR..."
+    @echo "⬇️ Pulling image from ECR..."
     docker pull $SSO_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:{{ tag }}
 
 [doc('Authenticate Docker client to the Amazon ECR registry.')]
@@ -202,7 +200,7 @@ clean:
     # Check first if there are any app subdirectories.
     @-find "{{ app_dir }}"/*/ -maxdepth 0 -empty -type d && \
         for entry in "{{ app_dir }}"/*/; do docker container remove --force `basename "$entry"`; done
-    # Remove images.
+    # Remove container images.
     # Check first if there are any app subdirectories.
     @-find "{{ app_dir }}"/*/ -maxdepth 0 -empty -type d && \
         for entry in "{{ app_dir }}"/*/; do docker image rm --force `basename "$entry"`; done
@@ -241,15 +239,6 @@ auth-devcontainer:
 devcontainer:
     op run --env-file=".env.local" -- devcontainer up
 
-# Run container of the built Drupal PROD image.
-run repository=repository_default tag="tag_default":
-    @echo "🐋 Running image container in Docker..."
-    docker run \
-        --detach \
-        --publish 8080:80 \
-        --name {{ repository }} \
-        {{ repository }}:{{ tag }}
-
 [arg("target", long="target")]
 [doc('Security scan with Trivy.')]
 [group('local')]
@@ -266,19 +255,17 @@ scan-image repository=repository_default tag=tag_default:
 
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
-[doc('Test Drupal image.')]
-[group('CI/CD')]
+[doc('Test Drupal container image.')]
 [group('local')]
 test repository=repository_default tag=tag_default: (docker-compose-up repository tag)
-    @echo "☑️ Testing image..."
+    @echo "☑️ Testing container image..."
 
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
-[doc('Test Drupal image.')]
-[group('CI/CD')]
+[doc('Test Drupal container image.')]
 [group('local')]
 test-simple-db repository=repository_default tag=tag_default: (docker-compose-up repository tag)
-    @echo "☑️ Testing image..."
+    @echo "☑️ Testing container image..."
     just drush --repository={{ repository }} --tag={{ tag }} \
         "site:install --account-name=admin --account-pass=admin --yes"
 
@@ -286,7 +273,6 @@ test-simple-db repository=repository_default tag=tag_default: (docker-compose-up
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
 [doc('Import DB.')]
-[group('CI/CD')]
 [group('local')]
 test-import-db repository=repository_default tag=tag_default db:  (docker-compose-up repository tag)
     @echo "🗃️ Importing DB..."
@@ -300,7 +286,6 @@ test-import-db repository=repository_default tag=tag_default db:  (docker-compos
 [arg("repository", long="repository")]
 [arg("tag", long="tag")]
 [doc('Clean Testing artifacts.')]
-[group('CI/CD')]
 [group('local')]
 test-clean repository=repository_default tag=tag_default: (docker-compose-down repository tag)
     @echo "❌ Cleaning test artifacts..."
@@ -331,7 +316,8 @@ docker-compose-down repository=repository_default tag=tag_default:
 [private]
 docker-compose-cli repository=repository_default tag=tag_default +COMMAND='':
     @echo "🏃‍♂️ Docker compose cli..."
-    DRUPAL_IMAGE_NAME={{ repository }} DRUPAL_IMAGE_TAG={{ tag }} \
+    DRUPAL_IMAGE_NAME={{ repository }} \
+        DRUPAL_IMAGE_TAG={{ tag }} \
         docker compose --file {{ docker_compose_file }} exec --no-tty drupal bash -c "{{ COMMAND }}"
 
 [arg("repository", long="repository")]
@@ -340,7 +326,8 @@ docker-compose-cli repository=repository_default tag=tag_default +COMMAND='':
 [private]
 docker-compose-cli-interactive repository=repository_default tag=tag_default:
     @echo "🏃‍♂️ Docker compose cli interactive..."
-    DRUPAL_IMAGE_NAME={{ repository }} DRUPAL_IMAGE_TAG={{ tag }} \
+    DRUPAL_IMAGE_NAME={{ repository }} \
+        DRUPAL_IMAGE_TAG={{ tag }} \
         docker compose --file {{ docker_compose_file }} exec drupal bash
 
 [arg("repository", long="repository")]
