@@ -138,4 +138,4 @@ just push-ghcr myorg/myapp v1.0.0
 
 ## License
 
-MIT - See [LICENSE](./LICENSE)
+Apache-2.0 - See [LICENSE](./LICENSE)
