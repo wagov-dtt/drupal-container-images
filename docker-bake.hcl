@@ -85,14 +85,15 @@ target "build-test" {
   inherits   = ["base"]
   platforms  = [platform(ARCH)]
   tags       = notequal(TAGS, "${REPOSITORY_NAME}:latest") && notequal(TAGS, "") ? tags(TAGS) : ["${REPOSITORY_NAME}:test"]
-  cache-from = ["type=gha,scope=${ARCH}"]
-  cache-to   = ["type=gha,mode=max,scope=${ARCH}"]
+  # Cache configuration as advised in: https://docs.docker.com/build/ci/github-actions/cache/#github-cache
+  cache-from = ["type=gha"]
+  cache-to = ["type=gha,mode=max"]
 }
 
 # CI release - multi-platform with cache from native builds
 target "release" {
   inherits   = ["base"]
-  platforms  = [platform("amd64")]
+  platforms  = [platform(ARCH)]
   tags       = notequal(TAGS, "${REPOSITORY_NAME}:latest") ? tags(TAGS) : release_tags()
   # CRITICAL: Disable attestations that break AWS ECR.
   provenance = false
@@ -104,7 +105,7 @@ target "release" {
   ]
   # Force Docker V2 manifest format instead of OCI, required by AWS ECR.
   output = ["type=image,oci-mediatypes=false"]
-  cache-from = [
-    "type=gha,scope=amd64"
-  ]
+  # Cache configuration as advised in: https://docs.docker.com/build/ci/github-actions/cache/#github-cache
+  cache-from = ["type=gha"]
+  cache-to = ["type=gha,mode=max"]
 }
