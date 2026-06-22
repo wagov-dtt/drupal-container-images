@@ -26,6 +26,12 @@
 		# Realpath cache - reduce filesystem stat() calls.
 		php_ini realpath_cache_size 8192K
 		php_ini realpath_cache_ttl 600
+
+		# Symfony Mailer library has a default timeout for sending a message
+		# before throwing an exception set to the value of default_socket_timeout.
+		# Lowering the timeout to 45s to not have problem with CDN timeout.
+		# @see https://symfony.com/doc/current/mailer.html
+		php_ini default_socket_timeout 45
 	}
 	order php_server before file_server
 	order php before file_server
