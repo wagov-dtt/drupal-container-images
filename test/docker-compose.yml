@@ -4,12 +4,13 @@ services:
     image: "${DRUPAL_IMAGE_NAME}:${DRUPAL_IMAGE_TAG}"
     container_name: drupal
     environment:
-      DB_HOST: drupal-mysql
-      DB_PORT: 3306
       DB_DATABASE: drupal
       DB_USERNAME: drupal
       DB_PASSWORD: drupal
-      TRUSTED_HOST: ^localhost$|^127\.0\.0\.1$
+      DB_HOST: drupal-mysql
+      DB_PORT: 3306
+      DB_DRIVER: mysql
+      TRUSTED_HOST_PATTERNS: ^localhost$ ^127\.0\.0\.1$
       DRUSH_OPTIONS_URI: http://localhost:3000
       SMTP_USERNAME: drupal
       SMTP_PASSWORD: drupal
