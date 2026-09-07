@@ -99,8 +99,13 @@ RUN mkdir -p ${COMPOSER_CACHE_DIR}
 # Copy composer files first for better caching
 COPY composer.json composer.lock* ./
 
-# Copy patches folder with patches to be used by composer install
-COPY patches ./patches/
+# Copy patches folder if present (might be required by composer install)
+# The brackets ([]) turns the exact folder path to pattern allowing conditional copy
+COPY ./patche[s]/ ./patches/
+
+# Copy any google site verification if present (might be required by composer install)
+# The wildcard (*) allows conditional copy
+COPY ./google*.html .
 
 # Install dependencies (without scripts - they may need full app)
 RUN composer install --no-dev --no-scripts --optimize-autoloader --prefer-dist --ansi --no-interaction
