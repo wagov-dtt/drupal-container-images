@@ -99,6 +99,9 @@ RUN mkdir -p ${COMPOSER_CACHE_DIR}
 # Copy composer files first for better caching
 COPY composer.json composer.lock* ./
 
+# Copy patches folder with patches to be used by composer install
+COPY patches ./patches/
+
 # Install dependencies (without scripts - they may need full app)
 RUN composer install --no-dev --no-scripts --optimize-autoloader --prefer-dist --ansi --no-interaction
 
