@@ -10,8 +10,9 @@ services:
       DB_HOST: drupal-mysql
       DB_PORT: 3306
       DB_DRIVER: mysql
-      TRUSTED_HOST_PATTERNS: ^localhost$ ^127\.0\.0\.1$
       DRUSH_OPTIONS_URI: http://localhost:3000
+      # HASH_SALT: hash('sha256','localhost')
+      HASH_SALT: 49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763
       SMTP_USERNAME: drupal
       SMTP_PASSWORD: drupal
       SMTP_HOST: mailpit
@@ -19,6 +20,7 @@ services:
       # SMTP_HOST: 192.0.2.1
       SMTP_PORT: 1025
       SITE_EMAIL: noreply-wa-jobs@www.wa.gov.au
+      TRUSTED_HOST_PATTERNS: ^localhost$ ^127\.0\.0\.1$
     ports:
       - "3000:8080"
     volumes:
