@@ -3,6 +3,8 @@ services:
   drupal:
     image: "${DRUPAL_IMAGE_NAME}:${DRUPAL_IMAGE_TAG}"
     container_name: drupal
+    env_file:
+      - ./data/.env
     environment:
       DB_DATABASE: drupal
       DB_USERNAME: drupal
@@ -23,8 +25,8 @@ services:
       TRUSTED_HOST_PATTERNS: ^localhost$ ^127\.0\.0\.1$
     ports:
       - "3000:8080"
-    volumes:
-      - ./data/files:/app/web/sites/default/files
+    # volumes:
+    #  - ./data/files:/app/web/sites/default/files
     restart: always
     # Uncomment the volumes line and set to the local path of your Drupal
     # installation, if you need to work with a local codebase.
