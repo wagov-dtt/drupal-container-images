@@ -146,24 +146,23 @@ COPY --chown=www-data:www-data --from=build /app /app
 ENV PATH="/app/vendor/bin:${PATH}"
 
 # Environment variables
-ENV APP_ENV=production \
-    APP_DEBUG=false \
-    LOG_CHANNEL=stderr \
-    SERVER_NAME=:8080 \
-    SERVER_ROOT=/app/web \
+ENV APP_DEBUG=false \
+    APP_ENV=production \
     DB_DATABASE=provide_db_name \
     DB_USERNAME=provide_db_username \
     DB_PASSWORD=provide_db_password \
     DB_HOST=provide_db_host \
     DB_PORT=provide_db_port \
     DB_DRIVER=mysql \
-    TRUSTED_HOST_PATTERNS='^www\.example\.com$' \
     DRUSH_OPTIONS_URI='https://www.example.com' \
+    SERVER_NAME=:8080 \
+    SERVER_ROOT=/app/web \
     SMTP_USERNAME=provide_smtp_username \
     SMTP_PASSWORD=provide_smtp_password \
     SMTP_HOST=provide_smtp_host \
     SMTP_PORT=provide_smtp_port \
     SITE_EMAIL=noreply-wa-jobs@www.wa.gov.au \
+    TRUSTED_HOST_PATTERNS='^www\.example\.com$' \
     TRUSTED_REVERSE_PROXY_IP=provide_trusted_reverse_proxy_ip
 
 # Expose non-privileged port
