@@ -112,6 +112,39 @@ The repository contains **Trivy config file**: `trivy.yaml` that is automaticall
 | `TRUSTED_HOST_PATTERNS`    | `^www\.example\.com$`           | Trusted host pattern                                                      |
 | `TRUSTED_REVERSE_PROXY_IP` | -                               | Trusted reverse proxy IP(s), example: `a.b.c.d,e.f.g.h/24`                |
 
+### PHP Extensions
+
+- pcu  
+- bcmath  
+- ctype  
+- curl  
+- dom  
+- exif  
+- fileinfo  
+- filter  
+- gd  
+- hash  
+- intl  
+- mbstring  
+- memcached  
+- mysqli  
+- opcache  
+- openssl  
+- pcntl  
+- pcre  
+- pdo  
+- pdo_mysql  
+- pdo_pgsql  
+- redis  
+- session  
+- simplexml  
+- soap  
+- tokenizer  
+- xml  
+- xmlreader  
+- xmlwriter  
+- zip
+
 ### Custom Config
 
 Place custom files in `conf/`:
