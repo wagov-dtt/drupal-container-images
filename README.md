@@ -108,6 +108,7 @@ The repository contains **Trivy config file**: `trivy.yaml` that is automaticall
 | `SMTP_HOST`                | -                               | SMTP hostname                                                             |
 | `SMTP_PORT`                | -                               | SMTP port                                                                 |
 | `SITE_EMAIL`               | `noreply-wa-jobs@www.wa.gov.au` | Drupal website email used as the from email address.                      |
+| `TMP`                      | `/tmp`                          | Temporary directory                                                       |
 | `TRUSTED_HOST_PATTERNS`    | `^www\.example\.com$`           | Trusted host pattern                                                      |
 | `TRUSTED_REVERSE_PROXY_IP` | -                               | Trusted reverse proxy IP(s), example: `a.b.c.d,e.f.g.h/24`                |
 

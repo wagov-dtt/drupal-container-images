@@ -162,6 +162,7 @@ ENV APP_DEBUG=false \
     SMTP_HOST=provide_smtp_host \
     SMTP_PORT=provide_smtp_port \
     SITE_EMAIL=noreply-wa-jobs@www.wa.gov.au \
+    TMP='/tmp' \
     TRUSTED_HOST_PATTERNS='^www\.example\.com$' \
     TRUSTED_REVERSE_PROXY_IP=provide_trusted_reverse_proxy_ip
 
