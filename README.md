@@ -4,6 +4,10 @@ Building process for **production-ready** container images for **Drupal** applic
 
 For development/contributing to this repo, see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
+## Related
+
+- [Drupal Files](docs/drupal-files.md)
+
 ## Quick Start
 
 ```bash
