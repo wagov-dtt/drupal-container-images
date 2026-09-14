@@ -94,6 +94,8 @@ The repository contains **Trivy config file**: `trivy.yaml` that is automaticall
 
 ### Environment Variables
 
+It is **RECOMMENDED** to **NOT** rely on **default** values but rather define all **Environment Variables** per container as the **default** values might change in the future.
+
 | Variable                   | Default                         | Description                                                                          |
 | -------------------------- | ------------------------------- | ------------------------------------------------------------------------------------ |
 | `APP_ENV`                  | `production`                    | Application environment                                                              |
