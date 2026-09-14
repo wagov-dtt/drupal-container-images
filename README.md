@@ -94,27 +94,30 @@ The repository contains **Trivy config file**: `trivy.yaml` that is automaticall
 
 ### Environment Variables
 
-| Variable                   | Default                         | Description                                                               |
-| -------------------------- | ------------------------------- | ------------------------------------------------------------------------- |
-| `APP_ENV`                  | `production`                    | Application environment                                                   |
-| `APP_DEBUG`                | `false`                         | Enable debug mode                                                         |
-| `DB_HOST`                  | -                               | MySQL hostname                                                            |
-| `DB_PORT`                  | `3306`                          | MySQL port                                                                |
-| `DB_DATABASE`              | -                               | Database name                                                             |
-| `DB_USERNAME`              | -                               | Database user                                                             |
-| `DB_PASSWORD`              | -                               | Database password                                                         |
-| `DB_DRIVER`                | `mysql`                         | Database driver                                                           |
-| `DRUSH_OPTIONS_URI`        | -                               | Drupal site URI for Drush CLI commands (required for `uli`, `cron`, etc.) |
-| `SERVER_NAME`              | `:80`                           | Server hostname                                                           |
-| `SERVER_ROOT`              | `/app/web`                      | Document root                                                             |
-| `SMTP_USERNAME`            | -                               | SMTP user                                                                 |
-| `SMTP_PASSWORD`            | -                               | SMTP password                                                             |
-| `SMTP_HOST`                | -                               | SMTP hostname                                                             |
-| `SMTP_PORT`                | -                               | SMTP port                                                                 |
-| `SITE_EMAIL`               | `noreply-wa-jobs@www.wa.gov.au` | Drupal website email used as the from email address.                      |
-| `TMP`                      | `/tmp`                          | Temporary directory                                                       |
-| `TRUSTED_HOST_PATTERNS`    | `^www\.example\.com$`           | Trusted host pattern                                                      |
-| `TRUSTED_REVERSE_PROXY_IP` | -                               | Trusted reverse proxy IP(s), example: `a.b.c.d,e.f.g.h/24`                |
+| Variable                   | Default                         | Description                                                                          |
+| -------------------------- | ------------------------------- | ------------------------------------------------------------------------------------ |
+| `APP_ENV`                  | `production`                    | Application environment                                                              |
+| `APP_DEBUG`                | `false`                         | Enable debug mode                                                                    |
+| `DB_HOST`                  | -                               | MySQL hostname                                                                       |
+| `DB_PORT`                  | `3306`                          | MySQL port                                                                           |
+| `DB_DATABASE`              | -                               | Database name                                                                        |
+| `DB_USERNAME`              | -                               | Database user                                                                        |
+| `DB_PASSWORD`              | -                               | Database password                                                                    |
+| `DB_DRIVER`                | `mysql`                         | Database driver                                                                      |
+| `DRUSH_OPTIONS_URI`        | -                               | Drupal site URI for Drush CLI commands (required for `uli`, `cron`, etc.)            |
+| `FILES_PATH_PUBLIC`        | `sites/default/files`           | Path for the Public files<br><br>Overrides the default value from `settings.php`.    |
+| `FILES_PATH_PRIVATE`       | `sites/default/private`         | Path for the Private files<br><br>Overrides the default value from `settings.php`.   |
+| `FILES_PATH_GENERATED`     | `sites/default/generated`       | Path for the Generated files<br><br>Overrides the default value from `settings.php`. |
+| `SERVER_NAME`              | `:80`                           | Server hostname                                                                      |
+| `SERVER_ROOT`              | `/app/web`                      | Document root                                                                        |
+| `SMTP_USERNAME`            | -                               | SMTP user                                                                            |
+| `SMTP_PASSWORD`            | -                               | SMTP password                                                                        |
+| `SMTP_HOST`                | -                               | SMTP hostname                                                                        |
+| `SMTP_PORT`                | -                               | SMTP port                                                                            |
+| `SITE_EMAIL`               | `noreply-wa-jobs@www.wa.gov.au` | Drupal website email used as the from email address.                                 |
+| `TMP`                      | `/tmp`                          | Temporary directory                                                                  |
+| `TRUSTED_HOST_PATTERNS`    | `^www\.example\.com$`           | Trusted host pattern                                                                 |
+| `TRUSTED_REVERSE_PROXY_IP` | -                               | Trusted reverse proxy IP(s), example: `a.b.c.d,e.f.g.h/24`                           |
 
 ### PHP Extensions
 
