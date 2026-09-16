@@ -6,7 +6,13 @@
 # https://caddyserver.com/docs/caddyfile
 #
 # Validate with: caddy fmt --diff Caddyfile
+
+# Global options.
+# @See: https://caddyserver.com/docs/caddyfile/options
 {
+	# Disables both certificate automation and HTTP-to-HTTPS redirects.
+	auto_https off
+
 	frankenphp {
 		# PHP tuning for large sites (100+ modules, 100K+ content).
 		php_ini memory_limit 1G
